@@ -149,6 +149,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="dbg\break_point.hpp" />
+    <ClInclude Include="dbg\menu_bar.hpp" />
+    <ClInclude Include="dbg\output.hpp" />
+    <ClInclude Include="dbg\process.hpp" />
+    <ClInclude Include="dbg\process_selector.hpp" />
+    <ClInclude Include="dbg\tool_bar.hpp" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_opengl2.h" />
@@ -163,7 +169,13 @@
     <ClInclude Include="window\window.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="dbg\break_point.cpp" />
     <ClCompile Include="dbg\dbg_main.cpp" />
+    <ClCompile Include="dbg\menu_bar.cpp" />
+    <ClCompile Include="dbg\output.cpp" />
+    <ClCompile Include="dbg\process.cpp" />
+    <ClCompile Include="dbg\process_selector.cpp" />
+    <ClCompile Include="dbg\tool_bar.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />

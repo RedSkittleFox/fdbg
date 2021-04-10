@@ -43,5 +43,9 @@
 #define STRICT
 
 #include <Windows.h>
+#include <psapi.h>
+
+#include <exception>
+#define WIN_ASSERT(X, MSG) if(##X == 0) throw std::exception(##MSG##);
 
 #endif
