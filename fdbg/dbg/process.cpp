@@ -1,4 +1,5 @@
 #include <fdbg/dbg/process.hpp>
+#include <fdbg/dbg/debug_task_queue.hpp>
 
 process& process::instance()
 {
@@ -6,9 +7,30 @@ process& process::instance()
 	return p;
 }
 
+void process::start(const std::string& path_, std::string cmd_, const std::string& env_)
+{
+	this->detach();
+	m_should_kill_process = true;
+	auto startup = [this, path_, cmd_, env_]
+	{
+		auto cmd = cmd_;
+		STARTUPINFO si{ 0 };
+		PROCESS_INFORMATION pi{ 0 };
+		si.cb = sizeof(si);
+		CreateProcess(path_.c_str(), cmd == "" ? nullptr : cmd.data(), nullptr, nullptr, false,
+			DEBUG_ONLY_THIS_PROCESS, // TODO: Should this be DEBUG_ONLY_THIS_PROCESS?
+			nullptr, env_ == "" ? nullptr : env_.c_str(), &si, &pi);
+
+		this->m_process = pi.dwProcessId;
+		WIN_ASSERT(DebugSetProcessKillOnExit(false));
+	};
+	debug_task_queue::instance().push(startup);
+}
+
 void process::attach(DWORD p_)
 {
 	detach();
+	m_should_kill_process = false;
 	WIN_ASSERT(DebugActiveProcess(p_), "Failed to attach to the process.");
 	WIN_ASSERT(DebugSetProcessKillOnExit(false));
 
@@ -19,7 +41,21 @@ void process::detach()
 {
 	if (m_process != 0)
 	{
-		WIN_ASSERT(DebugActiveProcessStop(m_process), "Unable to stop debugging the process.");
+		DWORD pid = m_process;
+		if(!should_kill())
+			debug_task_queue::instance().push([pid] { DebugActiveProcessStop(pid); });
+		else
+			debug_task_queue::instance().push([pid] 
+				{
+					HANDLE proc = OpenProcess(PROCESS_ALL_ACCESS, false, pid);
+					TerminateProcess(proc, 0);
+					CloseHandle(proc);
+					DebugActiveProcessStop(pid);
+				});
+		
+		HANDLE proc = OpenProcess(PROCESS_ALL_ACCESS, false, m_process);
+		DebugBreakProcess(proc);
+		CloseHandle(proc);
 		m_process = 0;
 	}
 }
@@ -32,4 +68,9 @@ DWORD process::get_process() const noexcept
 bool process::valid()
 {
 	return m_process != 0;
+}
+
+bool process::should_kill()
+{
+	return m_should_kill_process;
 }

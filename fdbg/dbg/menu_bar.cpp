@@ -4,6 +4,7 @@
 #include <fdbg/dbg/menu_bar.hpp>
 #include <fdbg/dbg/process.hpp>
 #include <fdbg/dbg/process_selector.hpp>
+#include <fdbg/dbg/process_launcher.hpp>
 
 menu_bar& menu_bar::instance()
 {
@@ -19,7 +20,7 @@ void menu_bar::update()
         {
             if (ImGui::MenuItem("Start New Process"))
             {
-                
+                process_launcher::instance().pop();
             }
             if (ImGui::MenuItem("Attach Process"))
             {

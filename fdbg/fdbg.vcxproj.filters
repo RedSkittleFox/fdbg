@@ -66,7 +66,31 @@
     <ClInclude Include="dbg\output.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dbg\break_point.hpp">
+    <ClInclude Include="dbg\break_points.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dbg\debug_task_queue.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dbg\threads.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dbg\dlls.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dbg\process_launcher.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="nativefiledialog\common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="nativefiledialog\nfd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="nativefiledialog\nfd_common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="filemin.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -119,10 +143,28 @@
     <ClCompile Include="dbg\output.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dbg\break_point.cpp">
+    <ClCompile Include="dbg\break_points.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dbg\process.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dbg\debug_task_queue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dbg\threads.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dbg\dlls.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dbg\process_launcher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="nativefiledialog\nfd_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="nativefiledialog\nfd_win.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

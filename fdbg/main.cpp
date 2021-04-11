@@ -2,6 +2,8 @@
 #include <fdbg/window/window.hpp>
 #include <fdbg/window/graphics.hpp>
 #include <fdbg/window/imgui.hpp>
+#include <fdbg/dbg/process.hpp>
+#include <fdbg/dbg/debug_task_queue.hpp>
 
 #include <thread>
 #include <atomic>
@@ -31,7 +33,7 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     }
 
     dbg_communication_loop_stop();
-    
+
     destroy_imgui();
     destroy_graphics(wnd);
     destroy_window(wnd);

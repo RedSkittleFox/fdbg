@@ -149,11 +149,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="dbg\break_point.hpp" />
+    <ClInclude Include="dbg\break_points.hpp" />
+    <ClInclude Include="dbg\debug_task_queue.hpp" />
+    <ClInclude Include="dbg\dlls.hpp" />
+    <ClInclude Include="filemin.hpp" />
     <ClInclude Include="dbg\menu_bar.hpp" />
     <ClInclude Include="dbg\output.hpp" />
     <ClInclude Include="dbg\process.hpp" />
+    <ClInclude Include="dbg\process_launcher.hpp" />
     <ClInclude Include="dbg\process_selector.hpp" />
+    <ClInclude Include="dbg\threads.hpp" />
     <ClInclude Include="dbg\tool_bar.hpp" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
@@ -163,18 +168,25 @@
     <ClInclude Include="imgui\imstb_rectpack.h" />
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
+    <ClInclude Include="nativefiledialog\common.h" />
+    <ClInclude Include="nativefiledialog\nfd.h" />
+    <ClInclude Include="nativefiledialog\nfd_common.h" />
     <ClInclude Include="window\graphics.hpp" />
     <ClInclude Include="window\imgui.hpp" />
     <ClInclude Include="winmin.hpp" />
     <ClInclude Include="window\window.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dbg\break_point.cpp" />
+    <ClCompile Include="dbg\break_points.cpp" />
     <ClCompile Include="dbg\dbg_main.cpp" />
+    <ClCompile Include="dbg\debug_task_queue.cpp" />
+    <ClCompile Include="dbg\dlls.cpp" />
     <ClCompile Include="dbg\menu_bar.cpp" />
     <ClCompile Include="dbg\output.cpp" />
     <ClCompile Include="dbg\process.cpp" />
+    <ClCompile Include="dbg\process_launcher.cpp" />
     <ClCompile Include="dbg\process_selector.cpp" />
+    <ClCompile Include="dbg\threads.cpp" />
     <ClCompile Include="dbg\tool_bar.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
@@ -184,6 +196,8 @@
     <ClCompile Include="imgui\imgui_tables.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="nativefiledialog\nfd_common.c" />
+    <ClCompile Include="nativefiledialog\nfd_win.cpp" />
     <ClCompile Include="window\graphics.cpp" />
     <ClCompile Include="window\imgui_impl.cpp" />
     <ClCompile Include="window\window.cpp" />

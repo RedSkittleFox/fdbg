@@ -7,14 +7,17 @@
 class process
 {
 	DWORD m_process = 0;
+	bool m_should_kill_process = false;
 
 public:
 	static process& instance();
 public:
+	void start(const std::string& path_, std::string cmd_ = "", const std::string& env_ = "");
 	void attach(DWORD p_);
 	void detach();
 	DWORD get_process() const noexcept;
 	bool valid();
+	bool should_kill();
 };
 
 #endif

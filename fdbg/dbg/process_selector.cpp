@@ -7,12 +7,12 @@
 #include <array>
 #include <algorithm>
 #include <numeric>
-
 #include <fdbg/winmin.hpp>
 #include <fdbg/imgui/imgui.h>
 
 #include <fdbg/dbg/process_selector.hpp>
 #include <fdbg/dbg/process.hpp>
+#include <fdbg/dbg/debug_task_queue.hpp>
 
 static std::string get_process_name(DWORD pid)
 {
@@ -130,8 +130,6 @@ void process_selector::update()
             ImGui::EndMenuBar();
         }
 
-        ImGui::CalcItemWidth();
-
         // Create child to control window height
         ImGui::BeginChild("ProcessesTable", ImVec2(0, -25), false, ImGuiWindowFlags_AlwaysAutoResize);
         if (ImGui::BeginTable("Processes", 2, ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY | ImGuiTableFlags_Sortable))
@@ -185,7 +183,6 @@ void process_selector::update()
                 items_need_sort = false;
             }
             
-            // Demonstrate using clipper for large vertical lists
             ImGuiListClipper clipper;
             clipper.Begin(filter_entries.size());
             while (clipper.Step())
@@ -262,7 +259,7 @@ void process_selector::update()
             if (currently_selected >= 0)
             {
                 DWORD current_pid = m_processes[filter_entries[currently_selected]].first;
-                process::instance().attach(current_pid);
+                debug_task_queue::instance().push([=]() { process::instance().attach(current_pid); });
             }
 
             ImGui::CloseCurrentPopup();
