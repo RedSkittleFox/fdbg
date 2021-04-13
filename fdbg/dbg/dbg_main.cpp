@@ -14,6 +14,8 @@
 #include <fdbg/dbg/threads.hpp>
 #include <fdbg/dbg/dlls.hpp>
 #include <fdbg/dbg/process_launcher.hpp>
+#include <fdbg/dbg/break_points.hpp>
+#include <fdbg/dbg/registers.hpp>
 
 // Hack: exclusion of code
 static std::mutex& mutex()
@@ -36,63 +38,123 @@ void dbg_communication_loop()
 {
     static DEBUG_EVENT dbe;
     DWORD continue_status = DBG_CONTINUE;
+    static bool hit_once = false;
 
     while (db_communication_loop_flag)
     {
-        debug_task_queue::instance().execute();
-        if (!process::instance().valid())
-            continue;
-
-        WaitForDebugEvent(&dbe, INFINITE);
+        // Execute remote task
         mutex().lock();
+        debug_task_queue::instance().execute();
+        
+        // Skip if process isn't valid
+        if (!process::instance().valid()) // FIXME: This causes spin lock
+            goto end;
+
+        if (break_points::instance().triggered()) goto end;
+
+        mutex().unlock();
+        
+        if(!WaitForDebugEvent(&dbe, INFINITE)) goto end;
+        mutex().lock();
+
+        break_points::instance().set_debug_identifiers(dbe.dwProcessId, dbe.dwThreadId);
+
+        // Set current thread
+        if (dbe.dwProcessId == process::instance().get_process())
+        {
+            threads::instance().set_current_thread(dbe.dwThreadId);
+            threads::instance().update_handles();
+        }
 
         switch (dbe.dwDebugEventCode)
         {
         case EXCEPTION_DEBUG_EVENT:
+        {
             switch (dbe.u.Exception.ExceptionRecord.ExceptionCode)
             {
             case EXCEPTION_ACCESS_VIOLATION:
                 break;
             case EXCEPTION_BREAKPOINT:
+            {
+                
+                if (hit_once == false)
+                {
+                    hit_once = true;
+                    ContinueDebugEvent(dbe.dwProcessId, dbe.dwThreadId, continue_status);
+                    goto end;
+                }
+                // Try handling stepping breakpoint
+
+                if (dbe.dwProcessId == process::instance().get_process())
+                {
+                    // Check if we are a step break point and if yes do sth about it
+                    break_points::instance().revert_break_point(dbe.u.Exception.ExceptionRecord.ExceptionAddress);
+                }
                 break;
+            }
             case EXCEPTION_DATATYPE_MISALIGNMENT:
                 break;
             case EXCEPTION_SINGLE_STEP:
+            {
+                if (dbe.dwProcessId == process::instance().get_process())
+                {
+                    break_points::instance().rever_trap_break_points();
+                }
                 break;
+            }
             case DBG_CONTROL_C:
                 break;
             default:
                 break;
             }
-            break;
+            break_points::instance().trigger();
+            registers::instance().update_context();
+            goto end; // Don't call continue debug
+        }
         case CREATE_THREAD_DEBUG_EVENT:
-            threads::instance().register_thread(dbe.dwThreadId, dbe.u.CreateThread.hThread, "");
+            if(dbe.dwProcessId == process::instance().get_process())
+                threads::instance().register_thread(dbe.dwThreadId, dbe.u.CreateThread.hThread, "");
             output::instance().printl("Debug", std::string("Thread ") + std::to_string(dbe.dwThreadId) + std::string(" created."));
             break;
         case EXIT_THREAD_DEBUG_EVENT:
-            threads::instance().unregister_thread(dbe.dwThreadId);
+            if(dbe.dwProcessId == process::instance().get_process())
+                threads::instance().unregister_thread(dbe.dwThreadId);
             output::instance().printl("Debug", std::string("Thread ") + std::to_string(dbe.dwThreadId) + std::string(" exited with the code ") +
             std::to_string(dbe.u.ExitThread.dwExitCode) + std::string("."));
             break;
         case CREATE_PROCESS_DEBUG_EVENT:
         {
-            LPVOID start_address = std::bit_cast<LPVOID>(dbe.u.CreateProcessInfo.lpStartAddress);
+            hit_once = false;
+            LPVOID start_address = dbe.u.CreateProcessInfo.lpStartAddress;
             std::string filename = GetFileNameFromHandle(dbe.u.LoadDll.hFile);
             output::instance().printl("Debug", std::string("Loaded '") + filename + std::string("'."));
-            dlls::instance().register_dll(filename, start_address);
+            if(dbe.dwProcessId == process::instance().get_process())
+                dlls::instance().register_dll(filename, start_address);
 
-            // TODO: Break point?
+            if (dbe.dwProcessId == process::instance().get_process())
+            {
+                // TODO: Create a breakpoint on the first instruciton
+                if (menu_bar::instance().config.debug.break_on_first_instruction)
+                {
+                    break_points::instance().create_break_point(start_address);
+                }
+            }
 
             break;
         }
         case EXIT_PROCESS_DEBUG_EVENT:
+            if(dbe.dwProcessId == process::instance().get_process())
+                process::instance().detach();
+            output::instance().printl("Debug", std::string("Process has exited with code '") + std::to_string(dbe.u.ExitProcess.dwExitCode) + std::string("."));
+
             break;
         case LOAD_DLL_DEBUG_EVENT:
         {
             LPVOID start_address = std::bit_cast<LPVOID>(dbe.u.LoadDll.lpBaseOfDll);
             std::string filename = GetFileNameFromHandle(dbe.u.LoadDll.hFile);
             output::instance().printl("Debug", std::string("Loaded '") + filename + std::string("'."));
-            dlls::instance().register_dll(filename, start_address);
+            if(dbe.dwProcessId == process::instance().get_process())
+                dlls::instance().register_dll(filename, start_address);
             // dbe.u.LoadDll.
             break;
         }
@@ -100,7 +162,8 @@ void dbg_communication_loop()
         {
             LPVOID start_address = dbe.u.UnloadDll.lpBaseOfDll;
             std::string filename = dlls::instance().unregister_dll(start_address);
-            output::instance().printl("Debug", std::string("Unloaded '") + filename + std::string("'."));
+            if(dbe.dwProcessId == process::instance().get_process())
+                output::instance().printl("Debug", std::string("Unloaded '") + filename + std::string("'."));
             break;
         }
         case OUTPUT_DEBUG_STRING_EVENT:
@@ -113,9 +176,9 @@ void dbg_communication_loop()
         }
 
         ContinueDebugEvent(dbe.dwProcessId, dbe.dwThreadId, continue_status);
+        end:
         mutex().unlock();
     }
-    int a;
 }
 
 void dbg_update()
@@ -130,6 +193,7 @@ void dbg_update()
     output::instance().update();
     threads::instance().update();
     process_launcher::instance().update();
+    registers::instance().update();
 
     static bool show_window = true;
     if (show_window)

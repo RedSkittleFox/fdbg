@@ -2,6 +2,8 @@
 #include <fdbg/winmin.hpp>
 
 #include <fdbg/dbg/tool_bar.hpp>
+#include <fdbg/dbg/break_points.hpp>
+#include <fdbg/dbg/process.hpp>
 
 tool_bar& tool_bar::instance()
 {
@@ -18,11 +20,24 @@ void tool_bar::update()
 
 	ImGui::Begin("TOOLBAR", NULL, window_flags);
 
-	ImGui::Button("Continue");
+	if (ImGui::Button("Continue"))
+	{
+		break_points::instance().continue_debug();
+	}
+
 	ImGui::SameLine();
-	ImGui::Button("Break");
+	if (ImGui::Button("Break"))
+	{
+		DebugBreakProcess(process::instance().handle());
+	}
 	ImGui::SameLine();
-	ImGui::Button("Step Over");
+	
+	if (ImGui::Button("Step Over"))
+	{
+		break_points::instance().create_trap_break_point();
+		break_points::instance().continue_debug();
+	}
+
 	ImGui::SameLine();
 	ImGui::Button("Step In");
 	ImGui::SameLine();

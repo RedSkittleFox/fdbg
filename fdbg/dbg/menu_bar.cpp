@@ -57,6 +57,11 @@ void menu_bar::update()
             if (ImGui::MenuItem("Paste", "CTRL+V")) {}
             ImGui::EndMenu();
         }
+        if (ImGui::BeginMenu("Debug"))
+        {
+            ImGui::Checkbox("Break on first instruction.", &config.debug.break_on_first_instruction);
+            ImGui::EndMenu();
+        }
         ImGui::EndMainMenuBar();
     }
 }

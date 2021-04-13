@@ -77,3 +77,32 @@ void threads::unregister_thread(DWORD id_)
 			return e__.id == id_;
 		});
 }
+
+threads::thread_entry_t& threads::current_thread()
+{
+	// TODO: Do a check
+	return m_threads[m_current_thread];
+}
+
+void threads::set_current_thread(DWORD id_)
+{
+	auto res = std::find_if(std::begin(m_threads), std::end(m_threads), [=](const auto& e__)
+		{
+			return e__.id == id_;
+		});
+
+	m_current_thread = std::distance(std::begin(m_threads), res) - 1;
+}
+
+void threads::update_handles()
+{
+	for (auto& t : m_threads)
+	{
+		t.handle = OpenThread(THREAD_ALL_ACCESS, false, t.id);
+	}
+}
+
+decltype(threads::m_threads)& threads::get_threads()
+{
+	return m_threads;
+}

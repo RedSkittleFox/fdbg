@@ -1,5 +1,7 @@
 #include <fdbg/dbg/process.hpp>
 #include <fdbg/dbg/debug_task_queue.hpp>
+#include <fdbg/dbg/menu_bar.hpp>
+#include <fdbg/dbg/break_points.hpp>
 
 process& process::instance()
 {
@@ -22,6 +24,7 @@ void process::start(const std::string& path_, std::string cmd_, const std::strin
 			nullptr, env_ == "" ? nullptr : env_.c_str(), &si, &pi);
 
 		this->m_process = pi.dwProcessId;
+		this->m_handle = pi.hProcess;
 		WIN_ASSERT(DebugSetProcessKillOnExit(false));
 	};
 	debug_task_queue::instance().push(startup);
@@ -29,18 +32,23 @@ void process::start(const std::string& path_, std::string cmd_, const std::strin
 
 void process::attach(DWORD p_)
 {
+	// Disable breaking on first instruction when we are attaching!
+	menu_bar::instance().config.debug.break_on_first_instruction = false;
+
 	detach();
 	m_should_kill_process = false;
 	WIN_ASSERT(DebugActiveProcess(p_), "Failed to attach to the process.");
 	WIN_ASSERT(DebugSetProcessKillOnExit(false));
 
 	m_process = p_;
+	m_handle = OpenProcess(PROCESS_ALL_ACCESS, false, m_process);
 }
 
 void process::detach()
 {
 	if (m_process != 0)
 	{
+		break_points::instance().continue_debug();
 		DWORD pid = m_process;
 		if(!should_kill())
 			debug_task_queue::instance().push([pid] { DebugActiveProcessStop(pid); });
@@ -63,6 +71,16 @@ void process::detach()
 DWORD process::get_process() const noexcept
 {
 	return m_process;
+}
+
+HANDLE process::handle()
+{
+	return m_handle;
+}
+
+void process::update_process_identifier(DWORD pid_)
+{
+	m_process = pid_;
 }
 
 bool process::valid()

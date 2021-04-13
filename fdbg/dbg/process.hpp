@@ -7,8 +7,8 @@
 class process
 {
 	DWORD m_process = 0;
+	HANDLE m_handle = 0;
 	bool m_should_kill_process = false;
-
 public:
 	static process& instance();
 public:
@@ -16,6 +16,10 @@ public:
 	void attach(DWORD p_);
 	void detach();
 	DWORD get_process() const noexcept;
+	HANDLE handle();
+	void update_process_identifier(DWORD pid_);
+	void open_handle();
+	void close_handle();
 	bool valid();
 	bool should_kill();
 };

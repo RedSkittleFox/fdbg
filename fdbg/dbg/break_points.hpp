@@ -16,28 +16,31 @@ public:
 		size_t line;
 
 		std::string dll;
-		size_t offset;
+		void* address;
 		std::byte replaced_instruction;
 	};
 	
-	// Inserted by the debugger
-	struct step_break_point
-	{
-		std::string dll;
-		size_t offset;
-		std::byte replaced_instruction;
-	};
-
 private:
 	bool m_break = false;
 	std::vector<break_point> m_break_points;
-	std::vector<step_break_point> m_step_break_points;
+
+	DWORD m_proc_id;
+	DWORD m_thread_id;
 
 public:
 	static break_points& instance();
 
 public:
+	void trigger();
 	bool triggered();
+	void continue_debug();
+	void create_break_point(void* address_);
+	void revert_break_point(void* address_);
+	// Set trap flag on every thread
+	void create_trap_break_point();
+	// Remove trap flag from every thread
+	void rever_trap_break_points();
+	void set_debug_identifiers(DWORD proc_, DWORD thread_);
 };
 
 #endif
