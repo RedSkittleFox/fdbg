@@ -45,14 +45,17 @@ void break_points::create_break_point(void* address_)
 	break_point bp;
 	bp.address = address_;
 
-	std::byte ist;
-	ReadProcessMemory(process::instance().handle(),
+	std::uint8_t ist;
+	
+	bool v = ReadProcessMemory(process::instance().handle(),
 		address_, &ist, 1, &read_bytes);
 
+	DWORD r = GetLastError();
+
 	bp.replaced_instruction = ist;
-	std::byte INT = static_cast<std::byte>(0xCC); // Interrupt instruction
-	WriteProcessMemory(process::instance().handle(), address_, &INT, 1, &read_bytes);
-	FlushInstructionCache(process::instance().handle(), address_, 1);
+	std::uint8_t INT = 0xCC; // Interrupt instruction
+	v = WriteProcessMemory(process::instance().handle(), address_, &INT, 1, &read_bytes);
+	v = FlushInstructionCache(process::instance().handle(), address_, 1);
 	m_break_points.push_back(bp);
 
 }
@@ -71,7 +74,7 @@ void break_points::revert_break_point(void* address_)
 	// Move back the instruction pointer
 
 	// Get context 
-	CONTEXT context;
+	CONTEXT context = {};
 	context.ContextFlags = CONTEXT_ALL;
 	bool v = GetThreadContext(threads::instance().current_thread().handle, &context);
 
@@ -94,6 +97,8 @@ void break_points::create_trap_break_point()
 	
 	for (auto& t : threads::instance().get_threads())
 	{
+		if (t.debug_enabled == false) continue;
+		
 		HANDLE hd = t.handle;
 		
 		debug_task_queue::instance().push(
@@ -139,4 +144,11 @@ void break_points::set_debug_identifiers(DWORD proc_, DWORD thread_)
 	m_thread_id = thread_;
 }
 
+void break_points::debug_break()
+{
+	if (!this->triggered() && process::instance().valid())
+	{
+		DebugBreakProcess(process::instance().handle());
+	}
+}
 

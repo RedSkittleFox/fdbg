@@ -45,6 +45,7 @@
 #include <Windows.h>
 #include <psapi.h>
 #include <strsafe.h>
+#include <DbgHelp.h>
 
 #include <exception>
 #include <array>

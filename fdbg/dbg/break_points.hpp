@@ -17,7 +17,7 @@ public:
 
 		std::string dll;
 		void* address;
-		std::byte replaced_instruction;
+		std::uint8_t replaced_instruction;
 	};
 	
 private:
@@ -41,6 +41,7 @@ public:
 	// Remove trap flag from every thread
 	void rever_trap_break_points();
 	void set_debug_identifiers(DWORD proc_, DWORD thread_);
+	void debug_break();
 };
 
 #endif

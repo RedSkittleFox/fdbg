@@ -28,7 +28,7 @@ void tool_bar::update()
 	ImGui::SameLine();
 	if (ImGui::Button("Break"))
 	{
-		DebugBreakProcess(process::instance().handle());
+		break_points::instance().debug_break();
 	}
 	ImGui::SameLine();
 	

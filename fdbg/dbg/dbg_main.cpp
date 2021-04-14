@@ -17,6 +17,25 @@
 #include <fdbg/dbg/break_points.hpp>
 #include <fdbg/dbg/registers.hpp>
 
+DWORD64 get_start_address(HANDLE hProcess)
+{
+    SYMBOL_INFO* pSymbol;
+    IMAGEHLP_SYMBOL64 sym = {};
+    sym.SizeOfStruct = sizeof(sym);
+
+    pSymbol = (SYMBOL_INFO*)new BYTE[sizeof(SYMBOL_INFO) + MAX_SYM_NAME];
+    pSymbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+    pSymbol->MaxNameLen = MAX_SYM_NAME;
+    bool val = SymFromName(hProcess, "WinMainCRTStartup", pSymbol);
+
+    // Store address, before deleting pointer  
+    DWORD64 dwAddress = pSymbol->Address;
+
+    delete[](BYTE*)pSymbol; // Valid syntax!
+
+    return dwAddress;
+}
+
 // Hack: exclusion of code
 static std::mutex& mutex()
 {
@@ -34,6 +53,7 @@ void dbg_communication_loop_stop()
     mutex().unlock();
 }
 
+// TODO: Refactor me
 void dbg_communication_loop()
 {
     static DEBUG_EVENT dbe;
@@ -63,7 +83,7 @@ void dbg_communication_loop()
         if (dbe.dwProcessId == process::instance().get_process())
         {
             threads::instance().set_current_thread(dbe.dwThreadId);
-            threads::instance().update_handles();
+            // threads::instance().update_handles();
         }
 
         switch (dbe.dwDebugEventCode)
@@ -88,6 +108,9 @@ void dbg_communication_loop()
                 if (dbe.dwProcessId == process::instance().get_process())
                 {
                     // Check if we are a step break point and if yes do sth about it
+                    auto curr = threads::instance().current_thread().id;
+                    auto c2 = dbe.dwThreadId;
+
                     break_points::instance().revert_break_point(dbe.u.Exception.ExceptionRecord.ExceptionAddress);
                 }
                 break;
@@ -99,12 +122,28 @@ void dbg_communication_loop()
                 if (dbe.dwProcessId == process::instance().get_process())
                 {
                     break_points::instance().rever_trap_break_points();
+
+                    if (threads::instance().current_thread().debug_enabled != true)
+                    {
+                        break_points::instance().create_trap_break_point();
+                        ContinueDebugEvent(dbe.dwProcessId, dbe.dwThreadId, continue_status);
+                        goto end;
+                    }
                 }
                 break;
             }
             case DBG_CONTROL_C:
                 break;
+            case EXCEPTION_PRIV_INSTRUCTION:
+            {
+                auto p = dbe.u.Exception.ExceptionRecord.ExceptionAddress;
+                ContinueDebugEvent(dbe.dwProcessId, dbe.dwThreadId, continue_status);
+                goto end;
+                break;
+            }
             default:
+                ContinueDebugEvent(dbe.dwProcessId, dbe.dwThreadId, continue_status);
+                goto end;
                 break;
             }
             break_points::instance().trigger();
@@ -125,18 +164,23 @@ void dbg_communication_loop()
         case CREATE_PROCESS_DEBUG_EVENT:
         {
             hit_once = false;
-            LPVOID start_address = dbe.u.CreateProcessInfo.lpStartAddress;
             std::string filename = GetFileNameFromHandle(dbe.u.LoadDll.hFile);
             output::instance().printl("Debug", std::string("Loaded '") + filename + std::string("'."));
-            if(dbe.dwProcessId == process::instance().get_process())
-                dlls::instance().register_dll(filename, start_address);
-
             if (dbe.dwProcessId == process::instance().get_process())
             {
+                threads::instance().register_thread(dbe.dwThreadId, OpenThread(THREAD_ALL_ACCESS, false, dbe.dwThreadId), "<main thread>");
+
+                dlls::instance().register_dll(filename,
+                    dbe.u.CreateProcessInfo.lpStartAddress,
+                    dbe.u.CreateProcessInfo.dwDebugInfoFileOffset);
+
                 // TODO: Create a breakpoint on the first instruciton
                 if (menu_bar::instance().config.debug.break_on_first_instruction)
                 {
-                    break_points::instance().create_break_point(start_address);
+                    void* add = (void*)get_start_address(process::instance().handle());
+                    void* b = (void*)((DWORD64)dbe.u.CreateProcessInfo.lpBaseOfImage + (DWORD64)add);
+                    void* other = dbe.u.CreateProcessInfo.lpStartAddress;
+                    break_points::instance().create_break_point(other);
                 }
             }
 
@@ -154,7 +198,7 @@ void dbg_communication_loop()
             std::string filename = GetFileNameFromHandle(dbe.u.LoadDll.hFile);
             output::instance().printl("Debug", std::string("Loaded '") + filename + std::string("'."));
             if(dbe.dwProcessId == process::instance().get_process())
-                dlls::instance().register_dll(filename, start_address);
+                dlls::instance().register_dll(filename, start_address, dbe.u.LoadDll.dwDebugInfoFileOffset);
             // dbe.u.LoadDll.
             break;
         }

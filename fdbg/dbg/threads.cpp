@@ -91,14 +91,14 @@ void threads::set_current_thread(DWORD id_)
 			return e__.id == id_;
 		});
 
-	m_current_thread = std::distance(std::begin(m_threads), res) - 1;
+	m_current_thread = std::distance(std::begin(m_threads), res);
 }
 
 void threads::update_handles()
 {
 	for (auto& t : m_threads)
 	{
-		t.handle = OpenThread(THREAD_ALL_ACCESS, false, t.id);
+		t.handle = OpenThread(THREAD_GET_CONTEXT | THREAD_SET_CONTEXT, false, t.id);
 	}
 }
 

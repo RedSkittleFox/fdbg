@@ -1,7 +1,9 @@
+#include <fdbg/winmin.hpp>
 #include <fdbg/dbg/process.hpp>
 #include <fdbg/dbg/debug_task_queue.hpp>
 #include <fdbg/dbg/menu_bar.hpp>
 #include <fdbg/dbg/break_points.hpp>
+#include <fdbg/dbg/output.hpp>
 
 process& process::instance()
 {
@@ -26,6 +28,9 @@ void process::start(const std::string& path_, std::string cmd_, const std::strin
 		this->m_process = pi.dwProcessId;
 		this->m_handle = pi.hProcess;
 		WIN_ASSERT(DebugSetProcessKillOnExit(false));
+		
+		// TODO: Output dbg message
+		bool res = SymInitialize(pi.hProcess, nullptr, false);
 	};
 	debug_task_queue::instance().push(startup);
 }
@@ -42,6 +47,9 @@ void process::attach(DWORD p_)
 
 	m_process = p_;
 	m_handle = OpenProcess(PROCESS_ALL_ACCESS, false, m_process);
+
+	// TODO: Output dbg message
+	SymInitialize(m_handle, nullptr, false);
 }
 
 void process::detach()
@@ -76,11 +84,6 @@ DWORD process::get_process() const noexcept
 HANDLE process::handle()
 {
 	return m_handle;
-}
-
-void process::update_process_identifier(DWORD pid_)
-{
-	m_process = pid_;
 }
 
 bool process::valid()
