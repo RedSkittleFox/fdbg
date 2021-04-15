@@ -150,6 +150,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="dbg\break_points.hpp" />
+    <ClInclude Include="dbg\debug_events.hpp" />
     <ClInclude Include="dbg\debug_task_queue.hpp" />
     <ClInclude Include="dbg\dlls.hpp" />
     <ClInclude Include="dbg\registers.hpp" />
@@ -181,6 +182,7 @@
   <ItemGroup>
     <ClCompile Include="dbg\break_points.cpp" />
     <ClCompile Include="dbg\dbg_main.cpp" />
+    <ClCompile Include="dbg\debug_events.cpp" />
     <ClCompile Include="dbg\debug_task_queue.cpp" />
     <ClCompile Include="dbg\dlls.cpp" />
     <ClCompile Include="dbg\menu_bar.cpp" />
