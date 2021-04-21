@@ -29,8 +29,7 @@ void process::start(const std::string& path_, std::string cmd_, const std::strin
 		this->m_handle = pi.hProcess;
 		WIN_ASSERT(DebugSetProcessKillOnExit(false));
 		
-		// TODO: Output dbg message
-		bool res = SymInitialize(pi.hProcess, nullptr, false);
+
 	};
 	debug_task_queue::instance().push(startup);
 }
@@ -49,7 +48,7 @@ void process::attach(DWORD p_)
 	m_handle = OpenProcess(PROCESS_ALL_ACCESS, false, m_process);
 
 	// TODO: Output dbg message
-	SymInitialize(m_handle, nullptr, false);
+	// Attach symbol
 }
 
 void process::detach()
@@ -84,6 +83,11 @@ DWORD process::get_process() const noexcept
 HANDLE process::handle()
 {
 	return m_handle;
+}
+
+void process::handle(HANDLE hndl_)
+{
+	m_handle = hndl_;
 }
 
 bool process::valid()

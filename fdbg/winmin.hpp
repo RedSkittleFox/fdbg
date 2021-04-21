@@ -45,7 +45,11 @@
 #include <Windows.h>
 #include <psapi.h>
 #include <strsafe.h>
+
+#include <wrl/client.h>
 #include <DbgHelp.h>
+
+using Microsoft::WRL::ComPtr;
 
 #include <exception>
 #include <array>

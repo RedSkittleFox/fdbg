@@ -17,9 +17,7 @@ public:
 	void detach();
 	DWORD get_process() const noexcept;
 	HANDLE handle();
-	void update_process_identifier(DWORD pid_);
-	void open_handle();
-	void close_handle();
+	void handle(HANDLE hndl_);
 	bool valid();
 	bool should_kill();
 };

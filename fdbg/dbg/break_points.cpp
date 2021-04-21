@@ -4,6 +4,7 @@
 
 #include <fdbg/dbg/break_points.hpp>
 #include <fdbg/dbg/threads.hpp>
+#include <fdbg/dbg/stack_trace.hpp>
 
 break_points& break_points::instance()
 {
@@ -19,6 +20,7 @@ bool break_points::triggered()
 void break_points::trigger()
 {
 	m_break = true;
+	stack_trace::instance().update_data();
 }
 
 void break_points::continue_debug()

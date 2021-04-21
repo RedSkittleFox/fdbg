@@ -6,6 +6,7 @@
 #include <fdbg/dbg/output.hpp>
 #include <fdbg/dbg/dlls.hpp>
 #include <fdbg/dbg/menu_bar.hpp>
+#include <fdbg/dbg/debug_task_queue.hpp>
 
 // After connecting to the debugee a dummy breakpoint is triggered. 
 // We want to ignore it.
@@ -19,6 +20,18 @@ bool exception_debug_event(const DEBUG_EVENT& dbe_)
     {
         if (s_hit_once == false)
         {
+            // Enable debugging of DbgHelp
+            DWORD options = ::SymGetOptions();
+            // options |= SYMOPT_DEBUG | SYMOPT_DEFERRED_LOADS | SYMOPT_UNDNAME | SYMOPT_LOAD_LINES;
+            ::SymSetOptions(options);
+
+            bool ress = SymInitialize(process::instance().handle(), nullptr, true);
+            auto errr = GetLastError();
+            if (ress == false)
+            {
+                output::instance().printl("Debug", "Failed to initialize symbols.");
+            }
+
             s_hit_once = true;
             return true;
         }
@@ -83,7 +96,8 @@ bool create_process_debug_event(const DEBUG_EVENT& dbe_)
     s_hit_once = false;
 
     // TODO: Clear registers, threads, breakpoints etc.
-
+    process::instance().handle(dbe_.u.CreateProcessInfo.hProcess);
+    
     // get executable's file name and print debug message
     std::string filename = GetFileNameFromHandle(dbe_.u.LoadDll.hFile);
     output::instance().printl("Debug", std::string("Loaded '") + filename + std::string("'."));
@@ -94,6 +108,7 @@ bool create_process_debug_event(const DEBUG_EVENT& dbe_)
     // Register dll
     dlls::instance().register_dll(filename,
         dbe_.u.CreateProcessInfo.lpStartAddress,
+        dbe_.u.CreateProcessInfo.hFile,
         dbe_.u.CreateProcessInfo.dwDebugInfoFileOffset);
 
     // Break on entry point
@@ -127,7 +142,9 @@ bool load_dll_debug_event(const DEBUG_EVENT& dbe_)
     void* start_address = std::bit_cast<void*>(dbe_.u.LoadDll.lpBaseOfDll);
 
     // Register loaded dll.
-    dlls::instance().register_dll(filename, start_address, dbe_.u.LoadDll.dwDebugInfoFileOffset);
+    dlls::instance().register_dll(filename, start_address, 
+        dbe_.u.LoadDll.hFile,
+        dbe_.u.LoadDll.dwDebugInfoFileOffset);
         
     return true;
 }

@@ -17,7 +17,7 @@ public:
 		void* start_address;
 		bool debug_enabled;
 		DWORD64 module_handle;
-		IMAGEHLP_MODULE64 module_info;
+		bool loaded;
 	} dll_entry;
 
 private:
@@ -29,7 +29,7 @@ public:
 
 public:
 	void update();
-	void register_dll(const std::string& path_, void* start_address_, DWORD base_address_);
+	void register_dll(const std::string& path_, void* start_address_, HANDLE imgage_, DWORD base_address_);
 	std::string unregister_dll(void* start_address_);
 };
 

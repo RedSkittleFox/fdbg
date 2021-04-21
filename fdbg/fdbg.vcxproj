@@ -121,13 +121,17 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>opengl32.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -138,7 +142,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -147,6 +151,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>opengl32.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="dbg\break_points.hpp" />
@@ -154,6 +162,8 @@
     <ClInclude Include="dbg\debug_task_queue.hpp" />
     <ClInclude Include="dbg\dlls.hpp" />
     <ClInclude Include="dbg\registers.hpp" />
+    <ClInclude Include="dbg\source_view.hpp" />
+    <ClInclude Include="dbg\stack_trace.hpp" />
     <ClInclude Include="filemin.hpp" />
     <ClInclude Include="dbg\menu_bar.hpp" />
     <ClInclude Include="dbg\output.hpp" />
@@ -191,6 +201,8 @@
     <ClCompile Include="dbg\process_launcher.cpp" />
     <ClCompile Include="dbg\process_selector.cpp" />
     <ClCompile Include="dbg\registers.cpp" />
+    <ClCompile Include="dbg\source_view.cpp" />
+    <ClCompile Include="dbg\stack_trace.cpp" />
     <ClCompile Include="dbg\threads.cpp" />
     <ClCompile Include="dbg\tool_bar.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />

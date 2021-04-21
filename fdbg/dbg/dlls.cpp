@@ -14,21 +14,25 @@ void dlls::update()
 {
 }
 
-void dlls::register_dll(const std::string& path_, void* start_address_, DWORD base_address_)
+void dlls::register_dll(const std::string& path_, void* start_address_, HANDLE imgage_, DWORD base_address_)
 {
-	// Try to load debug information
-	DWORD64 base = SymLoadModule64(process::instance().handle(), nullptr, path_.c_str(), nullptr, base_address_, 0);
-
-	IMAGEHLP_MODULE64 module_info;
-	module_info.SizeOfStruct = sizeof(module_info);
-	bool res = SymGetModuleInfo64(process::instance().handle(), base, &module_info);
-
-	if (res == true && module_info.SymType == SymPdb)
+	std::string path;
+	// Get path
 	{
-		output::instance().print("Debug", " Symbols loaded.");
+		size_t pos = path_.find_last_of('\\');
+		path = std::string(path_, 0, pos);
 	}
 
-	m_dlls.push_back({ path_, start_address_, false, base, module_info });
+	DWORD64 base = SymLoadModule64(process::instance().handle(), nullptr, path_.c_str(), nullptr, base_address_, 0);
+	auto err = GetLastError();
+	bool loaded = false;
+	if (base != false)
+	{
+		output::instance().print("Debug", " Loaded Module.");
+		loaded = true;
+	}
+
+	m_dlls.push_back({ path_, start_address_, false, 0,  loaded});
 }
 
 std::string dlls::unregister_dll(void* start_address_)

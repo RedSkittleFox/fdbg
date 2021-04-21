@@ -17,6 +17,8 @@
 #include <fdbg/dbg/break_points.hpp>
 #include <fdbg/dbg/registers.hpp>
 #include <fdbg/dbg/debug_events.hpp>
+#include <fdbg/dbg/stack_trace.hpp>
+#include <fdbg/dbg/source_view.hpp>
 
 // Hack: exclusion of code
 
@@ -126,30 +128,10 @@ void dbg_update()
     threads::instance().update();
     process_launcher::instance().update();
     registers::instance().update();
+    stack_trace::instance().update();
+    source_view::instance().update();
 
-    static bool show_window = true;
-    if (show_window)
-    {
-        ImGui::Begin("Another Window", &show_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-        ImGui::Text("Hello from another window!");
-        if (ImGui::Button("Close Me"))
-            show_window = false;
-        ImGui::End();
-    }
+    static bool demo = true;
+    ImGui::ShowDemoWindow(&demo);
 
-    if (ImGui::Begin("Master Window"/*, nullptr, ImGuiWindowFlags_MenuBar*/))
-    {
-        ImGui::TextUnformatted("DockSpace below");
-
-    }
-    ImGui::End();
-
-    static bool gay = true;
-    ImGui::ShowDemoWindow(&gay);
-
-    if (ImGui::Begin("Dockable Window"))
-    {
-        ImGui::TextUnformatted("Test");
-    }
-    ImGui::End();
 }
