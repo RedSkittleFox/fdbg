@@ -3,7 +3,7 @@
 #define FDBG_DBG_REGISTERS_H_
 
 
-#include <fdbg/winmin.hpp>
+#include <fdbg/win32_helpers/windows.hpp>
 
 class registers
 {

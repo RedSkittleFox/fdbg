@@ -6,7 +6,7 @@
 #ifndef FDBG_DBG_DEBUG_EVENTS_H_
 #define FDBG_DBG_DEBUG_EVENTS_H_
 
-#include <fdbg/winmin.hpp>
+#include <fdbg/win32_helpers/windows.hpp>
 
 // If a funciton returns true then debugging should continue.
 // Suspend program's execution otherwise.

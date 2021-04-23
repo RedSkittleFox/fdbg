@@ -1,7 +1,7 @@
 #include <fdbg/window/graphics.hpp>
 
 #include <cstdint>
-#include <fdbg/winmin.hpp>
+#include <fdbg/win32_helpers/windows.hpp>
 #include <gl/GL.h>
 #include <gl/GLU.h>
 

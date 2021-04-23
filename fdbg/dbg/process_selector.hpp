@@ -6,7 +6,7 @@
 #include <string>
 #include <utility>
 
-#include <fdbg/winmin.hpp>
+#include <fdbg/win32_helpers/windows.hpp>
 
 class process_selector
 {

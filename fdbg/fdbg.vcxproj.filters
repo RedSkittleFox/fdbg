@@ -18,7 +18,7 @@
     <ClInclude Include="window\window.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="winmin.hpp">
+    <ClInclude Include="win32_helpers\windows.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="window\graphics.hpp">
@@ -90,9 +90,6 @@
     <ClInclude Include="nativefiledialog\nfd_common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="filemin.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="dbg\registers.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -106,6 +103,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="dbg\source_view.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dbg\stack_variables.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="win32_helpers\filesystem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="win32_helpers\string.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="win32_helpers\dbg_help.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -195,6 +204,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dbg\source_view.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dbg\stack_variables.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="win32_helpers\filesystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="win32_helpers\string.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="win32_helpers\dbg_help.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

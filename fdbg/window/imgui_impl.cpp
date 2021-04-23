@@ -1,6 +1,6 @@
 #include <fdbg/window/imgui.hpp>
 
-#include <fdbg/winmin.hpp>
+#include <fdbg/win32_helpers/windows.hpp>
 
 #include <fdbg/imgui/imgui.h>
 #include <fdbg/imgui/imgui_impl_win32.h>

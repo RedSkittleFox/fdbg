@@ -1,4 +1,7 @@
-#include <fdbg/winmin.hpp>
+#include <fdbg/win32_helpers/windows.hpp>
+#include <fdbg/win32_helpers/string.hpp>
+#include <fdbg/win32_helpers/dbg_help.hpp>
+
 #include <fdbg/imgui/imgui.h>
 
 #include <fdbg/dbg/stack_trace.hpp>
@@ -91,15 +94,25 @@ void stack_trace::update()
     ImGui::End();
 }
 
+BOOL WINAPI enum_symbols_callback(SYMBOL_INFO* sym_info__,
+    ULONG size__,
+    PVOID context__)
+{    
+    auto ptr = imagehlp_symbol_manager::instance().varaible(sym_info__->Index, sym_info__->ModBase);
+    if (ptr == nullptr) return true;
+
+    std::vector<imagehlp_symbol_variable*>* variables = std::bit_cast<std::vector<imagehlp_symbol_variable*>*>(context__);
+    variables->push_back(ptr);
+
+    return true;
+};
+
 void stack_trace::update_data()
 {
     // Clear the call stack
     m_call_stack.clear();
 
-    CONTEXT context;
-    context.ContextFlags = CONTEXT_FULL;
-    bool res = GetThreadContext(threads::instance().current_thread().handle, &context);
-
+    CONTEXT context = current_context();
 
     // Initialize 'stack' with some required stuff.
     STACKFRAME64 stack = { };
@@ -121,27 +134,18 @@ void stack_trace::update_data()
 
         if (!res) break;
 
-        IMAGEHLP_MODULE64 module = { 0 };
-        module.SizeOfStruct = sizeof(module);
-        res = SymGetModuleInfo64(process::instance().handle(), stack.AddrPC.Offset, &module);
+        imagehlp_module64 module;
+        SymGetModuleInfo64(process::instance().handle(), stack.AddrPC.Offset, &module);
         
         DWORD64 displacement;
-        // Allocate memory for string on stack
-        union
-        {
-            IMAGEHLP_SYMBOL64 symbol = {};
-            std::byte data[sizeof(IMAGEHLP_SYMBOL64) + MAX_SYM_NAME];
-        } u;
+        imagehlp_symbol64 symbol;
         
-        u.symbol.SizeOfStruct = sizeof(IMAGEHLP_SYMBOL64);
-        u.symbol.MaxNameLength = MAX_SYM_NAME;
+        SymGetSymFromAddr64(process::instance().handle(), stack.AddrPC.Offset, &displacement, &symbol);
 
-        SymGetSymFromAddr64(process::instance().handle(), stack.AddrPC.Offset, &displacement, &u.symbol);
+        if (symbol.Address == 0) continue;
 
-        if (u.symbol.Address == 0) continue;
-
-        IMAGEHLP_LINE64 line;
-        line.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
+        imagehlp_line64 line;
+        
         DWORD disp;
         bool external = SymGetLineFromAddr64(process::instance().handle(), stack.AddrPC.Offset, &disp, &line);
         
@@ -153,19 +157,31 @@ void stack_trace::update_data()
             line_number = line.LineNumber;
         }
         
+        std::vector<imagehlp_symbol_variable*> variables;
+        {
+            res = SymSetScopeFromAddr(process::instance().handle(), stack.AddrPC.Offset);
+            res = SymEnumSymbols(process::instance().handle(),
+                0,
+                "",
+                enum_symbols_callback,
+                &variables);
+            auto error = GetLastError();
+        }
+
         // Push entry onto callstack
         m_call_stack.push_back(
             call_stack_entry
             { 
-                .name = std::string(u.symbol.Name), 
-                .address = std::bit_cast<void*>(u.symbol.Address),
+                .name = std::string(symbol.Name), 
+                .address = std::bit_cast<void*>(symbol.Address),
                 .external = external == false ? true : false, // We are asigning values > 1 to this, is this safe?,
                 .line_number = line_number,
-                .source_file = filename
+                .source_file = filename,
+                .variables = variables
             }
         );
 
-        output::instance().printl("Debug", u.symbol.Name);
+        output::instance().printl("Debug", symbol.Name);
 
     } while (stack.AddrReturn.Offset != 0);
 }

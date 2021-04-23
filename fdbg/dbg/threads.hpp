@@ -2,7 +2,7 @@
 #ifndef FDBG_DBG_THREADS_H_
 #define FDBG_DBG_THREADS_H_
 
-#include <fdbg/winmin.hpp>
+#include <fdbg/win32_helpers/windows.hpp>
 #include <vector>
 #include <string>
 

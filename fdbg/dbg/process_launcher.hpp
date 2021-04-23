@@ -3,7 +3,7 @@
 #define FDBG_DBG_PROCESS_LAUNCHER_H_
 
 #include <array>
-#include <fdbg/winmin.hpp>
+#include <fdbg/win32_helpers/windows.hpp>
 
 class process_launcher
 {

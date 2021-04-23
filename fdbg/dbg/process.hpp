@@ -2,7 +2,8 @@
 #ifndef FDBG_DBG_PROCESS_H_
 #define FDBG_DBG_PROCESS_H_
 
-#include <fdbg/winmin.hpp>
+#include <string>
+#include <fdbg/win32_helpers/windows.hpp>
 
 class process
 {

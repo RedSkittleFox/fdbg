@@ -7,6 +7,7 @@
 #include <fdbg/dbg/dlls.hpp>
 #include <fdbg/dbg/menu_bar.hpp>
 #include <fdbg/dbg/debug_task_queue.hpp>
+#include <fdbg/win32_helpers/filesystem.hpp>
 
 // After connecting to the debugee a dummy breakpoint is triggered. 
 // We want to ignore it.
@@ -99,7 +100,7 @@ bool create_process_debug_event(const DEBUG_EVENT& dbe_)
     process::instance().handle(dbe_.u.CreateProcessInfo.hProcess);
     
     // get executable's file name and print debug message
-    std::string filename = GetFileNameFromHandle(dbe_.u.LoadDll.hFile);
+    std::string filename = get_file_name_from_handle(dbe_.u.LoadDll.hFile);
     output::instance().printl("Debug", std::string("Loaded '") + filename + std::string("'."));
 
     // Register main thread. CREATE_THREAD_DEBUG_EVENT is not called for it.
@@ -134,7 +135,7 @@ bool exit_process_debug_event(const DEBUG_EVENT& dbe_)
 bool load_dll_debug_event(const DEBUG_EVENT& dbe_)
 {
     // Output debug message
-    std::string filename = GetFileNameFromHandle(dbe_.u.LoadDll.hFile);
+    std::string filename = get_file_name_from_handle(dbe_.u.LoadDll.hFile);
     output::instance().printl("Debug", std::string("Loaded '") + filename + std::string("'."));
 
     // Get base address of dll.

@@ -3,7 +3,7 @@
 #include <string>
 
 #include <fdbg/imgui/imgui.h>
-#include <fdbg/winmin.hpp>
+#include <fdbg/win32_helpers/windows.hpp>
 
 #include <fdbg/dbg/menu_bar.hpp>
 #include <fdbg/dbg/process_selector.hpp>
@@ -19,6 +19,7 @@
 #include <fdbg/dbg/debug_events.hpp>
 #include <fdbg/dbg/stack_trace.hpp>
 #include <fdbg/dbg/source_view.hpp>
+#include <fdbg/dbg/stack_variables.hpp>
 
 // Hack: exclusion of code
 
@@ -130,6 +131,7 @@ void dbg_update()
     registers::instance().update();
     stack_trace::instance().update();
     source_view::instance().update();
+    stack_variables::instance().update();
 
     static bool demo = true;
     ImGui::ShowDemoWindow(&demo);

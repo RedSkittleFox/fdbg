@@ -5,7 +5,7 @@
 #include <string>
 #include <filesystem>
 #include <vector>
-#include <fdbg/winmin.hpp>
+#include <fdbg/win32_helpers/windows.hpp>
 
 class dlls
 {

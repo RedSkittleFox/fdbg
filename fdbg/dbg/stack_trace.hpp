@@ -4,6 +4,9 @@
 
 #include <string>
 #include <vector>
+#include <variant>
+
+#include <fdbg/win32_helpers/dbg_help.hpp>
 
 class stack_trace
 {
@@ -19,7 +22,7 @@ public:
         bool external;
         size_t line_number;
         std::string source_file;
-        // Tells if this is the stack entry we are currently debugging (is currently selected)
+        std::vector<imagehlp_symbol_variable*> variables;
     };
 
 private:

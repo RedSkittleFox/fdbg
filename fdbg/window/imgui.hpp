@@ -2,7 +2,7 @@
 #ifndef FDBG_WINDOW_IMGUI_H_
 #define FDBG_WINDOW_IMGUI_H_
 
-#include <fdbg/winmin.hpp>
+#include <fdbg/win32_helpers/windows.hpp>
 
 extern void create_imgui(HWND wnd);
 extern void update_imgui();
