@@ -129,6 +129,9 @@
     <ClInclude Include="model\m_tool_bar.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="controller\c_tool_bar.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -240,6 +243,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="view\v_tool_bar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="controller\c_tool_bar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

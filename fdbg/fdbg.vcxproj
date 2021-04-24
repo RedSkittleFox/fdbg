@@ -161,6 +161,7 @@
   <ItemGroup>
     <ClInclude Include="controller\controller_interface.hpp" />
     <ClInclude Include="controller\c_output.hpp" />
+    <ClInclude Include="controller\c_tool_bar.hpp" />
     <ClInclude Include="dbg\break_points.hpp" />
     <ClInclude Include="dbg\debug_events.hpp" />
     <ClInclude Include="dbg\debug_task_queue.hpp" />
@@ -201,6 +202,7 @@
   <ItemGroup>
     <ClCompile Include="controller\controller_interface.cpp" />
     <ClCompile Include="controller\c_output.cpp" />
+    <ClCompile Include="controller\c_tool_bar.cpp" />
     <ClCompile Include="dbg\break_points.cpp" />
     <ClCompile Include="dbg\dbg_main.cpp" />
     <ClCompile Include="dbg\debug_events.cpp" />
