@@ -156,7 +156,7 @@ template<class T> uint8_t model<T>::s_id = []() -> uint8_t
 template<class T> uint8_t view_model<T>::s_id = []() -> uint8_t
 {
     model_manager::instance().register_model<T>();
-    return model<T>::s_id_tracker++;
+    return view_model<T>::s_id_tracker++;
 }();
 
 template<class T> T& mvc() requires std::derived_from<T, model_interface>

@@ -53,8 +53,13 @@ using Microsoft::WRL::ComPtr;
 
 #include <exception>
 #include <array>
+#include <string>
+#include <vector>
+#include <utility>
 
 #define WIN_ASSERT(X, MSG) if(##X == 0) throw std::exception(##MSG##);
 
+std::string get_process_name(DWORD pid_);
+std::vector<std::pair<DWORD, std::string>> enum_proceseses();
 
 #endif

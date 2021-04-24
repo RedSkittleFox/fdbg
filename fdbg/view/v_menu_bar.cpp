@@ -8,6 +8,7 @@
 #include <fdbg/imgui/imgui.h>
 #include <fdbg/model/m_menu_bar.hpp>
 #include <fdbg/view/view_interface.hpp>
+#include <fdbg/model/m_process_selector.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Symbol:  menu_bar_view
@@ -72,7 +73,7 @@ void menu_bar_view::menu_file()
         }
         if (ImGui::MenuItem("Attach Process"))
         {
-            // process_selector::instance().pop();
+            mvc<process_selector_model>().view.visible = true;
         }
         if (ImGui::MenuItem("Detach Process"))
         {

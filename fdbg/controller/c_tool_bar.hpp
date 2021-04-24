@@ -7,9 +7,10 @@
 
 struct tool_bar_controller : public controller<tool_bar_controller, tool_bar_model>
 {
+public:
 	void update();
 
-	// Tools
+public:	// Tools
 	void continue_execution();
 	void break_execution();
 	void step_over();
