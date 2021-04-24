@@ -1,5 +1,5 @@
 #include <fdbg/win32_helpers/windows.hpp>
-#include <fdbg/dbg/output.hpp>
+#include <fdbg/controller/c_output.hpp>
 #include <fdbg/dbg/process.hpp>
 
 #include <fdbg/dbg/dlls.hpp>
@@ -28,7 +28,7 @@ void dlls::register_dll(const std::string& path_, void* start_address_, HANDLE i
 	bool loaded = false;
 	if (base != false)
 	{
-		output::instance().print("Debug", " Loaded Module.");
+		mvc<output_controller>().print("Debug", " Loaded Module.");
 		loaded = true;
 	}
 

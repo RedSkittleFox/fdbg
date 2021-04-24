@@ -1,9 +1,9 @@
+#include <fdbg/model/m_menu_bar.hpp>
 #include <fdbg/win32_helpers/windows.hpp>
 #include <fdbg/dbg/process.hpp>
 #include <fdbg/dbg/debug_task_queue.hpp>
-#include <fdbg/dbg/menu_bar.hpp>
 #include <fdbg/dbg/break_points.hpp>
-#include <fdbg/dbg/output.hpp>
+
 
 process& process::instance()
 {
@@ -37,7 +37,8 @@ void process::start(const std::string& path_, std::string cmd_, const std::strin
 void process::attach(DWORD p_)
 {
 	// Disable breaking on first instruction when we are attaching!
-	menu_bar::instance().config.debug.break_on_first_instruction = false;
+	// menu_bar::instance().config.debug.break_on_first_instruction = false;
+	model_manager::instance().model<menu_bar_model>().debug.break_on_first_instruction = false;
 
 	detach();
 	m_should_kill_process = false;

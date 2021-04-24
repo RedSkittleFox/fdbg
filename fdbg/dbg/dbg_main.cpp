@@ -5,11 +5,9 @@
 #include <fdbg/imgui/imgui.h>
 #include <fdbg/win32_helpers/windows.hpp>
 
-#include <fdbg/dbg/menu_bar.hpp>
 #include <fdbg/dbg/process_selector.hpp>
 #include <fdbg/dbg/process.hpp>
 #include <fdbg/dbg/tool_bar.hpp>
-#include <fdbg/dbg/output.hpp>
 #include <fdbg/dbg/debug_task_queue.hpp>
 #include <fdbg/dbg/threads.hpp>
 #include <fdbg/dbg/dlls.hpp>
@@ -122,10 +120,8 @@ void dbg_update()
     // Declare Central dockspace
     ImGui::DockSpaceOverViewport();
 
-    menu_bar::instance().update();
     process_selector::instance().update();
     tool_bar::instance().update();
-    output::instance().update();
     threads::instance().update();
     process_launcher::instance().update();
     registers::instance().update();

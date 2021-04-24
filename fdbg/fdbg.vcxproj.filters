@@ -54,16 +54,10 @@
     <ClInclude Include="dbg\process.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dbg\menu_bar.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="dbg\process_selector.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="dbg\tool_bar.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dbg\output.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="dbg\break_points.hpp">
@@ -117,6 +111,27 @@
     <ClInclude Include="win32_helpers\dbg_help.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="view\view_interface.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="view\v_menu_bar.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="model\model_interface.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="model\m_menu_bar.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="controller\controller_interface.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="model\m_output.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="controller\c_output.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -155,16 +170,10 @@
     <ClCompile Include="dbg\dbg_main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dbg\menu_bar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="dbg\process_selector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dbg\tool_bar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dbg\output.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dbg\break_points.cpp">
@@ -216,6 +225,24 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="win32_helpers\dbg_help.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="view\view_interface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="view\v_menu_bar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="model\model_interface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="controller\controller_interface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="view\v_output.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="controller\c_output.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

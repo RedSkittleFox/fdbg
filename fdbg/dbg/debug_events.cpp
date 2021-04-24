@@ -1,11 +1,12 @@
+#include <fdbg/model/m_menu_bar.hpp>
+
 #include <fdbg/dbg/debug_events.hpp>
 #include <fdbg/dbg/threads.hpp>
 #include <fdbg/dbg/break_points.hpp>
 #include <fdbg/dbg/process.hpp>
 #include <fdbg/dbg/registers.hpp>
-#include <fdbg/dbg/output.hpp>
+#include <fdbg/controller/c_output.hpp>
 #include <fdbg/dbg/dlls.hpp>
-#include <fdbg/dbg/menu_bar.hpp>
 #include <fdbg/dbg/debug_task_queue.hpp>
 #include <fdbg/win32_helpers/filesystem.hpp>
 
@@ -30,7 +31,7 @@ bool exception_debug_event(const DEBUG_EVENT& dbe_)
             auto errr = GetLastError();
             if (ress == false)
             {
-                output::instance().printl("Debug", "Failed to initialize symbols.");
+                mvc<output_controller>().printl("Debug", "Failed to initialize symbols.");
             }
 
             s_hit_once = true;
@@ -70,7 +71,7 @@ bool create_thread_debug_event(const DEBUG_EVENT& dbe_)
     
     // Output debug message
     // TODO: Use <format> or something sprintf_s
-    output::instance()
+    mvc<output_controller>()
         .printl("Debug", 
             std::string("Thread ") + std::to_string(dbe_.dwThreadId) + std::string(" created.")
         );
@@ -84,7 +85,7 @@ bool exit_thread_debug_event(const DEBUG_EVENT& dbe_)
     threads::instance().unregister_thread(dbe_.dwThreadId);
         
     // Output debug message
-    output::instance()
+    mvc<output_controller>()
         .printl("Debug", std::string("Thread ") + std::to_string(dbe_.dwThreadId) + std::string(" exited with the code ") +
         std::to_string(dbe_.u.ExitThread.dwExitCode) + std::string("."));
     
@@ -101,7 +102,7 @@ bool create_process_debug_event(const DEBUG_EVENT& dbe_)
     
     // get executable's file name and print debug message
     std::string filename = get_file_name_from_handle(dbe_.u.LoadDll.hFile);
-    output::instance().printl("Debug", std::string("Loaded '") + filename + std::string("'."));
+    mvc<output_controller>().printl("Debug", std::string("Loaded '") + filename + std::string("'."));
 
     // Register main thread. CREATE_THREAD_DEBUG_EVENT is not called for it.
     threads::instance().register_thread(dbe_.dwThreadId, OpenThread(THREAD_ALL_ACCESS, false, dbe_.dwThreadId), "<main thread>");
@@ -114,7 +115,7 @@ bool create_process_debug_event(const DEBUG_EVENT& dbe_)
 
     // Break on entry point
     // TODO: Find a better way to store global config
-    if (menu_bar::instance().config.debug.break_on_first_instruction)
+    if (model_manager::instance().model<menu_bar_model>().debug.break_on_first_instruction)
     {
         break_points::instance().create_break_point(dbe_.u.CreateProcessInfo.lpStartAddress);
     }
@@ -125,7 +126,7 @@ bool create_process_debug_event(const DEBUG_EVENT& dbe_)
 bool exit_process_debug_event(const DEBUG_EVENT& dbe_)
 {
     process::instance().detach();        
-    output::instance().printl("Debug", std::string("Process has exited with code '") + std::to_string(dbe_.u.ExitProcess.dwExitCode) + std::string("."));
+    mvc<output_controller>().printl("Debug", std::string("Process has exited with code '") + std::to_string(dbe_.u.ExitProcess.dwExitCode) + std::string("."));
 
     // TODO: Clear breakpoints, threads etc.
 
@@ -136,7 +137,7 @@ bool load_dll_debug_event(const DEBUG_EVENT& dbe_)
 {
     // Output debug message
     std::string filename = get_file_name_from_handle(dbe_.u.LoadDll.hFile);
-    output::instance().printl("Debug", std::string("Loaded '") + filename + std::string("'."));
+    mvc<output_controller>().printl("Debug", std::string("Loaded '") + filename + std::string("'."));
 
     // Get base address of dll.
     // It is used to identify dlls.
@@ -157,7 +158,7 @@ bool unload_dll_debug_event(const DEBUG_EVENT& dbe_)
     std::string filename = dlls::instance().unregister_dll(start_address);
 
     // Output debug message
-    output::instance().printl("Debug", std::string("Unloaded '") + filename + std::string("'."));
+    mvc<output_controller>().printl("Debug", std::string("Unloaded '") + filename + std::string("'."));
 
 	return true;
 }
@@ -165,14 +166,14 @@ bool unload_dll_debug_event(const DEBUG_EVENT& dbe_)
 bool output_debug_string_debug_event(const DEBUG_EVENT& dbe_)
 {
     // TODO:
-    output::instance().printl("Debug", "DEBUG MESSAGE SENT");
+    mvc<output_controller>().printl("Debug", "DEBUG MESSAGE SENT");
     return true;
 }
 
 bool rip_debug_event(const DEBUG_EVENT& dbe_)
 {
     // TODO: Detach debugger
-    output::instance().printl("Debug", "Process terminated...");
+    mvc<output_controller>().printl("Debug", "Process terminated...");
     process::instance().detach();
     // TODO: Clear everything
 	return true;

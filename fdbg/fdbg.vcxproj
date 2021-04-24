@@ -159,6 +159,8 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="controller\controller_interface.hpp" />
+    <ClInclude Include="controller\c_output.hpp" />
     <ClInclude Include="dbg\break_points.hpp" />
     <ClInclude Include="dbg\debug_events.hpp" />
     <ClInclude Include="dbg\debug_task_queue.hpp" />
@@ -167,13 +169,16 @@
     <ClInclude Include="dbg\source_view.hpp" />
     <ClInclude Include="dbg\stack_trace.hpp" />
     <ClInclude Include="dbg\stack_variables.hpp" />
-    <ClInclude Include="dbg\menu_bar.hpp" />
-    <ClInclude Include="dbg\output.hpp" />
     <ClInclude Include="dbg\process.hpp" />
     <ClInclude Include="dbg\process_launcher.hpp" />
     <ClInclude Include="dbg\process_selector.hpp" />
     <ClInclude Include="dbg\threads.hpp" />
     <ClInclude Include="dbg\tool_bar.hpp" />
+    <ClInclude Include="model\model_interface.hpp" />
+    <ClInclude Include="model\m_menu_bar.hpp" />
+    <ClInclude Include="model\m_output.hpp" />
+    <ClInclude Include="view\view_interface.hpp" />
+    <ClInclude Include="view\v_menu_bar.hpp" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_opengl2.h" />
@@ -195,13 +200,13 @@
     <ClInclude Include="window\window.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="controller\controller_interface.cpp" />
+    <ClCompile Include="controller\c_output.cpp" />
     <ClCompile Include="dbg\break_points.cpp" />
     <ClCompile Include="dbg\dbg_main.cpp" />
     <ClCompile Include="dbg\debug_events.cpp" />
     <ClCompile Include="dbg\debug_task_queue.cpp" />
     <ClCompile Include="dbg\dlls.cpp" />
-    <ClCompile Include="dbg\menu_bar.cpp" />
-    <ClCompile Include="dbg\output.cpp" />
     <ClCompile Include="dbg\process.cpp" />
     <ClCompile Include="dbg\process_launcher.cpp" />
     <ClCompile Include="dbg\process_selector.cpp" />
@@ -211,6 +216,9 @@
     <ClCompile Include="dbg\stack_variables.cpp" />
     <ClCompile Include="dbg\threads.cpp" />
     <ClCompile Include="dbg\tool_bar.cpp" />
+    <ClCompile Include="model\model_interface.cpp" />
+    <ClCompile Include="view\view_interface.cpp" />
+    <ClCompile Include="view\v_menu_bar.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
@@ -222,6 +230,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="nativefiledialog\nfd_common.c" />
     <ClCompile Include="nativefiledialog\nfd_win.cpp" />
+    <ClCompile Include="view\v_output.cpp" />
     <ClCompile Include="win32_helpers\dbg_help.cpp" />
     <ClCompile Include="win32_helpers\filesystem.cpp" />
     <ClCompile Include="win32_helpers\string.cpp" />

@@ -7,7 +7,7 @@
 #include <fdbg/dbg/stack_trace.hpp>
 #include <fdbg/dbg/process.hpp>
 #include <fdbg/dbg/threads.hpp>
-#include <fdbg/dbg/output.hpp>
+#include <fdbg/controller/c_output.hpp>
 #include <fdbg/dbg/dlls.hpp>
 
 stack_trace& stack_trace::instance()
@@ -181,7 +181,7 @@ void stack_trace::update_data()
             }
         );
 
-        output::instance().printl("Debug", symbol.Name);
+        mvc<output_controller>().printl("Debug", symbol.Name);
 
     } while (stack.AddrReturn.Offset != 0);
 }
