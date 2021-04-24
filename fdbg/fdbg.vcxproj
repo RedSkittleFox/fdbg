@@ -173,12 +173,11 @@
     <ClInclude Include="dbg\process_launcher.hpp" />
     <ClInclude Include="dbg\process_selector.hpp" />
     <ClInclude Include="dbg\threads.hpp" />
-    <ClInclude Include="dbg\tool_bar.hpp" />
     <ClInclude Include="model\model_interface.hpp" />
     <ClInclude Include="model\m_menu_bar.hpp" />
     <ClInclude Include="model\m_output.hpp" />
+    <ClInclude Include="model\m_tool_bar.hpp" />
     <ClInclude Include="view\view_interface.hpp" />
-    <ClInclude Include="view\v_menu_bar.hpp" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_opengl2.h" />
@@ -215,7 +214,6 @@
     <ClCompile Include="dbg\stack_trace.cpp" />
     <ClCompile Include="dbg\stack_variables.cpp" />
     <ClCompile Include="dbg\threads.cpp" />
-    <ClCompile Include="dbg\tool_bar.cpp" />
     <ClCompile Include="model\model_interface.cpp" />
     <ClCompile Include="view\view_interface.cpp" />
     <ClCompile Include="view\v_menu_bar.cpp" />
@@ -231,6 +229,7 @@
     <ClCompile Include="nativefiledialog\nfd_common.c" />
     <ClCompile Include="nativefiledialog\nfd_win.cpp" />
     <ClCompile Include="view\v_output.cpp" />
+    <ClCompile Include="view\v_tool_bar.cpp" />
     <ClCompile Include="win32_helpers\dbg_help.cpp" />
     <ClCompile Include="win32_helpers\filesystem.cpp" />
     <ClCompile Include="win32_helpers\string.cpp" />

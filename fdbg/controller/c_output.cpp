@@ -2,9 +2,6 @@
 
 output_controller::output_controller()
 {
-    auto& m = model();
-    m.output_buffers = std::vector<std::pair<std::string, std::string>>();
-
 	register_output_buffer("Debug");
 	register_output_buffer("General");
 }

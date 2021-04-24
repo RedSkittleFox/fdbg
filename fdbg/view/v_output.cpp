@@ -5,8 +5,16 @@
 class output_view : public view<output_view, output_model>
 {
 public:
+    output_view();
     virtual void draw() override final;
 };
+
+output_view::output_view()
+{
+    vmodel().visible = true;
+    vmodel().hideable = true;
+    vmodel().name = "Output View";
+}
 
 void output_view::draw()
 {

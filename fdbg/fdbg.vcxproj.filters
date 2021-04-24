@@ -57,9 +57,6 @@
     <ClInclude Include="dbg\process_selector.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dbg\tool_bar.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="dbg\break_points.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -114,9 +111,6 @@
     <ClInclude Include="view\view_interface.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="view\v_menu_bar.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="model\model_interface.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -130,6 +124,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="controller\c_output.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="model\m_tool_bar.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -171,9 +168,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dbg\process_selector.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dbg\tool_bar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dbg\break_points.cpp">
@@ -243,6 +237,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="controller\c_output.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="view\v_tool_bar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
