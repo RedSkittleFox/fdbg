@@ -62,4 +62,13 @@ using Microsoft::WRL::ComPtr;
 std::string get_process_name(DWORD pid_);
 std::vector<std::pair<DWORD, std::string>> enum_proceseses();
 
+// Wrapper to convert arguments
+static BOOL __stdcall process_memory_reader(
+    HANDLE phandle,
+    DWORD64 base,
+    PVOID buffer,
+    DWORD size,
+    LPDWORD bytes_read
+);
+
 #endif

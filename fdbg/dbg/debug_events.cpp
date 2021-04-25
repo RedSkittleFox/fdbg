@@ -2,7 +2,7 @@
 
 #include <fdbg/dbg/debug_events.hpp>
 #include <fdbg/dbg/threads.hpp>
-#include <fdbg/dbg/break_points.hpp>
+#include <fdbg/controller/c_break_points.hpp>
 #include <fdbg/dbg/process.hpp>
 #include <fdbg/dbg/registers.hpp>
 #include <fdbg/controller/c_output.hpp>
@@ -39,19 +39,19 @@ bool exception_debug_event(const DEBUG_EVENT& dbe_)
         }
 
         // Revert single hit breakpoint  
-        break_points::instance().revert_break_point(dbe_.u.Exception.ExceptionRecord.ExceptionAddress);
+        mvc<break_points_controller>().revert_break_point(dbe_.u.Exception.ExceptionRecord.ExceptionAddress);
         break;
     }
     case EXCEPTION_SINGLE_STEP:
     {
         // Clear all trap breakpoints
-        break_points::instance().rever_trap_break_points();
+        mvc<break_points_controller>().rever_trap_break_points();
 
         // If debugging current thread is dissabled, 
         // don't enter debug break mode
         if (threads::instance().current_thread().debug_enabled != true)
         {
-            break_points::instance().create_trap_break_point();
+            mvc<break_points_controller>().create_trap_break_point();
             return true;
         }
 
@@ -59,7 +59,7 @@ bool exception_debug_event(const DEBUG_EVENT& dbe_)
     }
     }
 
-    break_points::instance().trigger();
+    mvc<break_points_controller>().trigger();
     registers::instance().update_context();
 	return false;
 }
@@ -117,7 +117,7 @@ bool create_process_debug_event(const DEBUG_EVENT& dbe_)
     // TODO: Find a better way to store global config
     if (model_manager::instance().model<menu_bar_model>().debug.break_on_first_instruction)
     {
-        break_points::instance().create_break_point(dbe_.u.CreateProcessInfo.lpStartAddress);
+        mvc<break_points_controller>().create_break_point(dbe_.u.CreateProcessInfo.lpStartAddress);
     }
 
     return true;

@@ -55,3 +55,10 @@ std::vector<std::pair<DWORD, std::string>> enum_proceseses()
         return ret;
     }
 }
+
+// Wrapper to convert arguments
+// TODO: Should this be moved to winmin.hpp?
+BOOL __stdcall process_memory_reader(HANDLE phandle, DWORD64 base, PVOID buffer, DWORD size, LPDWORD bytes_read)
+{
+    return ReadProcessMemory(phandle, std::bit_cast<LPCVOID>(base), buffer, size, std::bit_cast<SIZE_T*>(bytes_read));
+}

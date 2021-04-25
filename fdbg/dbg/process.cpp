@@ -2,8 +2,7 @@
 #include <fdbg/win32_helpers/windows.hpp>
 #include <fdbg/dbg/process.hpp>
 #include <fdbg/dbg/debug_task_queue.hpp>
-#include <fdbg/dbg/break_points.hpp>
-
+#include <fdbg/controller/c_break_points.hpp>
 
 process& process::instance()
 {
@@ -56,7 +55,7 @@ void process::detach()
 {
 	if (m_process != 0)
 	{
-		break_points::instance().continue_debug();
+		mvc<break_points_controller>().continue_debug();
 		DWORD pid = m_process;
 		if(!should_kill())
 			debug_task_queue::instance().push([pid] { DebugActiveProcessStop(pid); });

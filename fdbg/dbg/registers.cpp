@@ -5,7 +5,7 @@
 
 #include <fdbg/dbg/threads.hpp>
 #include <fdbg/dbg/registers.hpp>
-#include <fdbg/dbg/break_points.hpp>
+#include <fdbg/controller/c_break_points.hpp>
 #include <fdbg/dbg/process.hpp>
 
 registers& registers::instance()
@@ -18,7 +18,7 @@ void registers::update()
 {
 	ImGuiWindowFlags flags = 0;
 
-	if (!break_points::instance().triggered())
+	if (!mvc<break_points_controller>().triggered())
 	{
 		flags |= ImGuiWindowFlags_NoInputs;
 		// ImGui::SetNextWindowBgAlpha(0.5);

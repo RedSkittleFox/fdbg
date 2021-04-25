@@ -33,6 +33,7 @@ public:
     virtual ~controller_interface() noexcept = default;
     virtual uint8_t id() const noexcept = 0;
     virtual void update();
+    virtual void break_point();
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -91,8 +92,9 @@ public:
     // Returns global instance of controller_manager
     static controller_manager& instance();
 public:
-    // Draws gui elements.
+    
     void update();
+    void break_point();
 
     // Access gui elements
     const std::vector<std::unique_ptr<controller_interface>>& controllers() const;

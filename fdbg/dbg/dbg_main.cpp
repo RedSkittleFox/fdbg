@@ -5,18 +5,15 @@
 #include <fdbg/imgui/imgui.h>
 #include <fdbg/win32_helpers/windows.hpp>
 
-#include <fdbg/dbg/process_selector.hpp>
 #include <fdbg/dbg/process.hpp>
 #include <fdbg/dbg/debug_task_queue.hpp>
 #include <fdbg/dbg/threads.hpp>
 #include <fdbg/dbg/dlls.hpp>
 #include <fdbg/dbg/process_launcher.hpp>
-#include <fdbg/dbg/break_points.hpp>
 #include <fdbg/dbg/registers.hpp>
 #include <fdbg/dbg/debug_events.hpp>
-#include <fdbg/dbg/stack_trace.hpp>
 #include <fdbg/dbg/source_view.hpp>
-#include <fdbg/dbg/stack_variables.hpp>
+#include <fdbg/controller/c_break_points.hpp>
 
 // Hack: exclusion of code
 
@@ -49,7 +46,7 @@ void dbg_communication_loop()
             if (!process::instance().valid()) continue;
 
             // If breakpoint is triggered. Don't debug
-            if (break_points::instance().triggered()) continue;
+            if (mvc<break_points_controller>().triggered()) continue;
         }
         
         // Wait for debug events
@@ -119,13 +116,10 @@ void dbg_update()
     // Declare Central dockspace
     ImGui::DockSpaceOverViewport();
 
-    process_selector::instance().update();
     threads::instance().update();
     process_launcher::instance().update();
     registers::instance().update();
-    stack_trace::instance().update();
     source_view::instance().update();
-    stack_variables::instance().update();
 
     static bool demo = true;
     ImGui::ShowDemoWindow(&demo);

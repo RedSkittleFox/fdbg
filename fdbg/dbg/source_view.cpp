@@ -1,6 +1,7 @@
 #include <fdbg/imgui/imgui.h>
 #include <fdbg/dbg/source_view.hpp>
-#include <fdbg/dbg/stack_trace.hpp>
+#include <fdbg/controller/c_break_points.hpp>
+#include <fdbg/controller/c_stack.hpp>
 
 source_view& source_view::instance()
 {
@@ -38,7 +39,7 @@ void source_view::update()
 
 	if (ImGui::Begin("Source View", &m_enabled))
 	{
-		auto current_stack_entry = stack_trace::instance().current_stack_entry();
+		auto current_stack_entry = mvc<stack_controller>().current_stack_entry();
 		auto current = m_files.find(current_stack_entry.source_file);
 		
 		if (current_stack_entry.address != s.current_address)
