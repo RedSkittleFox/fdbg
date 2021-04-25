@@ -57,13 +57,7 @@
     <ClInclude Include="dbg\debug_task_queue.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dbg\threads.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="dbg\dlls.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dbg\process_launcher.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="nativefiledialog\common.h">
@@ -73,9 +67,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="nativefiledialog\nfd_common.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dbg\registers.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="imgui\imgui_stdlib.h">
@@ -138,6 +129,21 @@
     <ClInclude Include="controller\c_break_points.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="model\m_registers.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="controller\c_registers.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="model\m_threads.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="controller\c_threads.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="model\m_process_launcher.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -182,22 +188,13 @@
     <ClCompile Include="dbg\debug_task_queue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dbg\threads.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="dbg\dlls.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dbg\process_launcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="nativefiledialog\nfd_common.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="nativefiledialog\nfd_win.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dbg\registers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="imgui\imgui_stdlib.cpp">
@@ -258,6 +255,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="view\v_stack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="controller\c_registers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="view\v_registers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="controller\c_threads.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="view\v_threads.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="view\v_process_launcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

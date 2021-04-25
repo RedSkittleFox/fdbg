@@ -7,10 +7,8 @@
 
 #include <fdbg/dbg/process.hpp>
 #include <fdbg/dbg/debug_task_queue.hpp>
-#include <fdbg/dbg/threads.hpp>
+#include <fdbg/controller/c_threads.hpp>
 #include <fdbg/dbg/dlls.hpp>
-#include <fdbg/dbg/process_launcher.hpp>
-#include <fdbg/dbg/registers.hpp>
 #include <fdbg/dbg/debug_events.hpp>
 #include <fdbg/dbg/source_view.hpp>
 #include <fdbg/controller/c_break_points.hpp>
@@ -56,7 +54,7 @@ void dbg_communication_loop()
             std::lock_guard<std::mutex> lg(s_thread_mx);
 
             // break_points::instance().set_debug_identifiers(dbe.dwProcessId, dbe.dwThreadId);
-            threads::instance().set_current_thread(dbe.dwThreadId);
+            mvc<threads_controller>().set_current_thread(dbe.dwThreadId);
 
             // Continue debugging if true
             static bool s_continue = true;
@@ -116,9 +114,6 @@ void dbg_update()
     // Declare Central dockspace
     ImGui::DockSpaceOverViewport();
 
-    threads::instance().update();
-    process_launcher::instance().update();
-    registers::instance().update();
     source_view::instance().update();
 
     static bool demo = true;

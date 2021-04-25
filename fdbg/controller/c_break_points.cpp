@@ -1,8 +1,9 @@
+#include <fdbg/win32_helpers/dbg_help.hpp>
 #include <fdbg/controller/c_break_points.hpp>
 
 #include <fdbg/dbg/process.hpp>
-#include <fdbg/dbg/threads.hpp>
 #include <fdbg/dbg/debug_task_queue.hpp>
+#include <fdbg/controller/c_threads.hpp>
 
 void break_points_controller::trigger()
 {
@@ -15,18 +16,19 @@ bool break_points_controller::triggered()
 	return model().in_break;
 }
 
+// TODO: Fixme
 void break_points_controller::continue_debug()
 {
 	if (model().in_break != false)
 	{
 		DWORD pi = process::instance().get_process();
-		DWORD ti = threads::instance().current_thread().id;
+		DWORD ti = mvc<threads_controller>().current_thread().id;
 
 		// ContinueDebugEvent has to be executed on the debugging thread.
 		debug_task_queue::instance().push([pi, ti]
 			{
 				DWORD current_proc = process::instance().get_process();
-				DWORD current_thread = threads::instance().current_thread().id;
+				DWORD current_thread = mvc<threads_controller>().current_thread().id;
 				ContinueDebugEvent(pi, ti, DBG_CONTINUE);
 			});
 	}
@@ -71,11 +73,11 @@ void break_points_controller::revert_break_point(void* address_)
 		// Get context 
 		CONTEXT context = {};
 		context.ContextFlags = CONTEXT_ALL;
-		bool v = GetThreadContext(threads::instance().current_thread().handle, &context);
+		bool v = GetThreadContext(dbg_thread(), &context);
 
 		// Push instruction pointer backwards
 		--context.Rip;
-		v = SetThreadContext(threads::instance().current_thread().handle, &context);
+		v = SetThreadContext(dbg_thread(), &context);
 	}
 
 	// Remove step break points
@@ -93,7 +95,7 @@ void break_points_controller::revert_break_point(void* address_)
 
 void break_points_controller::create_trap_break_point()
 {
-	for (auto& t : threads::instance().get_threads())
+	for (auto& t : mvc<threads_controller>().get_threads())
 	{
 		// If debugging of the thread is disabled, skip it
 		if (t.debug_enabled == false) continue;
@@ -118,7 +120,7 @@ void break_points_controller::create_trap_break_point()
 
 void break_points_controller::rever_trap_break_points()
 {
-	for (auto& t : threads::instance().get_threads())
+	for (auto& t : mvc<threads_controller>().get_threads())
 	{
 		debug_task_queue::instance().push([=]
 			{

@@ -1,18 +1,26 @@
 #include <fdbg/imgui/imgui.h>
 
-#include <fdbg/dbg/threads.hpp>
+#include <fdbg/view/view_interface.hpp>
+#include <fdbg/model/m_threads.hpp>
 
-threads& threads::instance()
+struct threads_view : public view<threads_view, threads_model>
 {
-	static threads t;
-	return t;
+	threads_view();
+	void draw();
+};
+
+threads_view::threads_view()
+{
+	vmodel().hideable = true;
+	vmodel().visible = true;
+	vmodel().name = "Threads";
 }
 
-void threads::update()
+void threads_view::draw()
 {
-	if (ImGui::Begin("Threads", &m_enabled))
+	if (ImGui::Begin("Threads", &(vmodel().visible)))
 	{
-		if (ImGui::BeginTable("ThreadsTable", 4, 
+		if (ImGui::BeginTable("ThreadsTable", 4,
 			ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY | ImGuiTableFlags_Sortable))
 		{
 			ImGui::TableSetupScrollFreeze(0, 1);
@@ -31,13 +39,13 @@ void threads::update()
 			ImGui::TableHeadersRow();
 
 			ImGuiListClipper clipper;
-			clipper.Begin(m_threads.size());
+			clipper.Begin(model().threads.size());
 			while (clipper.Step())
 			{
-				
+
 				for (int row_n = clipper.DisplayStart; row_n < clipper.DisplayEnd; row_n++)
 				{
-					auto& thread = m_threads[row_n];
+					auto& thread = model().threads[row_n];
 
 					ImGui::TableNextRow(ImGuiTableRowFlags_None, 0);
 
@@ -53,7 +61,7 @@ void threads::update()
 					ImGui::Text("%04d", thread.handle);
 
 					ImGui::TableSetColumnIndex(3);
-					ImGui::Selectable(thread.name.c_str(), m_current_thread == row_n, ImGuiSelectableFlags_SpanAllColumns);
+					ImGui::Selectable(thread.name.c_str(), model().current_thread == row_n, ImGuiSelectableFlags_SpanAllColumns);
 
 				}
 			}
@@ -63,46 +71,4 @@ void threads::update()
 		}
 	}
 	ImGui::End();
-}
-
-void threads::register_thread(DWORD id_, HANDLE handle_, std::string name_)
-{
-	m_threads.push_back({id_, handle_, name_, true});
-}
-
-void threads::unregister_thread(DWORD id_)
-{
-	std::erase_if(m_threads, [=](const auto& e__)
-		{
-			return e__.id == id_;
-		});
-}
-
-threads::thread_entry_t& threads::current_thread()
-{
-	// TODO: Do a check
-	return m_threads[m_current_thread];
-}
-
-void threads::set_current_thread(DWORD id_)
-{
-	auto res = std::find_if(std::begin(m_threads), std::end(m_threads), [=](const auto& e__)
-		{
-			return e__.id == id_;
-		});
-
-	m_current_thread = std::distance(std::begin(m_threads), res);
-}
-
-void threads::update_handles()
-{
-	for (auto& t : m_threads)
-	{
-		t.handle = OpenThread(THREAD_GET_CONTEXT | THREAD_SET_CONTEXT, false, t.id);
-	}
-}
-
-decltype(threads::m_threads)& threads::get_threads()
-{
-	return m_threads;
 }

@@ -203,5 +203,7 @@ public:
     imagehlp_symbol_function* function(DWORD id_, DWORD64 base_ = 0);
 };
 
+HANDLE dbg_process();
+HANDLE dbg_thread();
 
 #endif

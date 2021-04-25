@@ -1,10 +1,9 @@
 #include <fdbg/model/m_menu_bar.hpp>
 
 #include <fdbg/dbg/debug_events.hpp>
-#include <fdbg/dbg/threads.hpp>
+#include <fdbg/controller/c_threads.hpp>
 #include <fdbg/controller/c_break_points.hpp>
 #include <fdbg/dbg/process.hpp>
-#include <fdbg/dbg/registers.hpp>
 #include <fdbg/controller/c_output.hpp>
 #include <fdbg/dbg/dlls.hpp>
 #include <fdbg/dbg/debug_task_queue.hpp>
@@ -49,7 +48,7 @@ bool exception_debug_event(const DEBUG_EVENT& dbe_)
 
         // If debugging current thread is dissabled, 
         // don't enter debug break mode
-        if (threads::instance().current_thread().debug_enabled != true)
+        if (mvc<threads_controller>().current_thread().debug_enabled != true)
         {
             mvc<break_points_controller>().create_trap_break_point();
             return true;
@@ -60,14 +59,13 @@ bool exception_debug_event(const DEBUG_EVENT& dbe_)
     }
 
     mvc<break_points_controller>().trigger();
-    registers::instance().update_context();
 	return false;
 }
 
 bool create_thread_debug_event(const DEBUG_EVENT& dbe_)
 {
     // Register created thread
-    threads::instance().register_thread(dbe_.dwThreadId, dbe_.u.CreateThread.hThread, "");
+    mvc<threads_controller>().register_thread(dbe_.dwThreadId, dbe_.u.CreateThread.hThread, "");
     
     // Output debug message
     // TODO: Use <format> or something sprintf_s
@@ -82,7 +80,7 @@ bool create_thread_debug_event(const DEBUG_EVENT& dbe_)
 bool exit_thread_debug_event(const DEBUG_EVENT& dbe_)
 {
     // Unregister thread
-    threads::instance().unregister_thread(dbe_.dwThreadId);
+    mvc<threads_controller>().unregister_thread(dbe_.dwThreadId);
         
     // Output debug message
     mvc<output_controller>()
@@ -105,7 +103,7 @@ bool create_process_debug_event(const DEBUG_EVENT& dbe_)
     mvc<output_controller>().printl("Debug", std::string("Loaded '") + filename + std::string("'."));
 
     // Register main thread. CREATE_THREAD_DEBUG_EVENT is not called for it.
-    threads::instance().register_thread(dbe_.dwThreadId, OpenThread(THREAD_ALL_ACCESS, false, dbe_.dwThreadId), "<main thread>");
+    mvc<threads_controller>().register_thread(dbe_.dwThreadId, OpenThread(THREAD_ALL_ACCESS, false, dbe_.dwThreadId), "<main thread>");
 
     // Register dll
     dlls::instance().register_dll(filename,
@@ -127,6 +125,8 @@ bool exit_process_debug_event(const DEBUG_EVENT& dbe_)
 {
     process::instance().detach();        
     mvc<output_controller>().printl("Debug", std::string("Process has exited with code '") + std::to_string(dbe_.u.ExitProcess.dwExitCode) + std::string("."));
+
+    // Unregister thread
 
     // TODO: Clear breakpoints, threads etc.
 

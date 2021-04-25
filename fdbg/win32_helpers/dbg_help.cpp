@@ -1,9 +1,10 @@
 #include <unordered_map>
 #include <optional>
 
-#include <fdbg/dbg/threads.hpp>
 #include <fdbg/win32_helpers/dbg_help.hpp>
 #include <fdbg/dbg/process.hpp>
+
+#include <fdbg/controller/c_threads.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // dbg_help and DIA structs
@@ -100,7 +101,7 @@ CONTEXT current_context()
 {
 	CONTEXT context = {};
 	context.ContextFlags = CONTEXT_FULL;
-	GetThreadContext(threads::instance().current_thread().handle, &context);
+	GetThreadContext(dbg_thread(), &context);
 	return context;
 }
 
@@ -544,4 +545,14 @@ imagehlp_symbol_function* imagehlp_symbol_manager::register_function(DWORD id_, 
 	}
 
 	return &(m_functions.insert(std::make_pair(id_, func)).first->second);
+}
+
+HANDLE dbg_process()
+{
+	return HANDLE();
+}
+
+HANDLE dbg_thread()
+{
+	return mvc<threads_controller>().current_thread().handle;
 }

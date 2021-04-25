@@ -9,6 +9,7 @@
 #include <fdbg/model/m_menu_bar.hpp>
 #include <fdbg/view/view_interface.hpp>
 #include <fdbg/model/m_process_selector.hpp>
+#include <fdbg/model/m_process_launcher.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Symbol:  menu_bar_view
@@ -69,7 +70,7 @@ void menu_bar_view::menu_file()
     {
         if (ImGui::MenuItem("Start New Process"))
         {
-            // process_launcher::instance().pop();
+            mvc<process_launcher_model>().view.visible = true;
         }
         if (ImGui::MenuItem("Attach Process"))
         {

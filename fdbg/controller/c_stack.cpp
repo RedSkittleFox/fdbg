@@ -1,7 +1,6 @@
 #include <fdbg/controller/c_stack.hpp>
 #include <fdbg/controller/c_output.hpp>
 
-#include <fdbg/dbg/threads.hpp>
 #include <fdbg/dbg/process.hpp>
 
 static BOOL WINAPI enum_symbols_callback(SYMBOL_INFO* sym_info__,
@@ -38,7 +37,11 @@ void stack_controller::break_point()
     // Push elements onto call stack
     do
     {
-        bool res = StackWalk64(IMAGE_FILE_MACHINE_AMD64, process::instance().handle(), threads::instance().current_thread().handle, &stack,
+        bool res = StackWalk64(
+            IMAGE_FILE_MACHINE_AMD64, 
+            process::instance().handle(), 
+            dbg_thread(), 
+            &stack,
             &context, nullptr, SymFunctionTableAccess64,
             SymGetModuleBase64, 0);
 
