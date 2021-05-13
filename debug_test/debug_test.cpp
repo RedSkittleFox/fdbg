@@ -17,6 +17,7 @@ struct pod_test
 
 int main()
 {
+    size_t w = 3;
     std::cout << "Hello World!\n";
     pod_test pod;
     int* test = nullptr;

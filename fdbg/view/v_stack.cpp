@@ -3,6 +3,7 @@
 #include <fdbg/model/m_stack.hpp>
 #include <fdbg/controller/c_stack.hpp>
 #include <fdbg/controller/c_source_view.hpp>
+#include <fdbg/win32_helpers/dbg_help.hpp>
 
 struct stack_trace_view : public view<stack_trace_view, stack_trace_model>
 {
@@ -14,6 +15,7 @@ struct stack_variables_view : public view<stack_variables_view, stack_variables_
 {
     stack_variables_view();
 	void draw();
+    void draw_variable(imagehlp_symbol_variable* var_, size_t id_);
 };
 
 stack_trace_view::stack_trace_view()
@@ -106,38 +108,116 @@ void stack_variables_view::draw()
 
     if (ImGui::Begin("Stack Variables", &(vmodel().visible)))
     {
-        if (ImGui::BeginTable("StackVariablesTable", 2,
+        if (ImGui::BeginTable("StackVariablesTable", 3,
             ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable | ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_ScrollY))
         {
             ImGui::TableSetupScrollFreeze(0, 1);
             ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoSort | ImGuiTableColumnFlags_NoHide,
                 20, 0);
 
+            ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_NoSort | ImGuiTableColumnFlags_NoHide,
+                20, 0);
+
+            ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_NoSort | ImGuiTableColumnFlags_NoHide,
+                20, 0);
+
             ImGui::TableHeadersRow();
 
-            ImGuiListClipper clipper;
-            clipper.Begin(stack.variables.size());
-            while (clipper.Step())
+            for (size_t i{ 0llu }; i < stack.variables.size(); ++i)
             {
-                for (int row_n = clipper.DisplayStart; row_n < clipper.DisplayEnd; ++row_n)
-                {
-                    auto& variable = stack.variables[row_n];
-
-                    ImGui::TableNextRow(ImGuiTableRowFlags_None, 0);
-
-                    ImGui::TableSetColumnIndex(0);
-                    ImGui::PushID(row_n);
-                    if (ImGui::Selectable(variable->name.c_str(), false, ImGuiSelectableFlags_SpanAllColumns));
-                    ImGui::PopID();
-
-                    ImGui::TableSetColumnIndex(1);
-                    ImGui::Text("Name: %s Size: %i", variable->type->name.c_str(), variable->type->id);
-                }
+                draw_variable(stack.variables[i], i << 4);
             }
-            clipper.End();
 
             ImGui::EndTable();
         }
     }
     ImGui::End();
+}
+
+void stack_variables_view::draw_variable(imagehlp_symbol_variable* var_, size_t id_)
+{
+    ImGui::TableNextRow(ImGuiTableRowFlags_None, 0);
+
+    using st = imagehlp_symbol_type;
+        
+    // TODO: Enumeration type?
+    if (std::holds_alternative<typename st::fundamental>(var_->type->u))
+    {
+        ImGui::TableSetColumnIndex(0);
+        ImGui::PushID(id_);
+        if (ImGui::Selectable(var_->name.c_str(), false, ImGuiSelectableFlags_SpanAllColumns));
+        ImGui::PopID();
+
+        ImGui::TableSetColumnIndex(1);
+        ImGui::Text("%s", var_->type->name.c_str());
+    }
+    else if (std::holds_alternative<typename st::array>(var_->type->u))
+    {
+
+    }
+    else if (std::holds_alternative<typename st::pointer>(var_->type->u))
+    {
+        ImGui::TableSetColumnIndex(0);
+        ImGui::PushID(id_);
+        if (ImGui::Selectable(var_->name.c_str(), false, ImGuiSelectableFlags_SpanAllColumns));
+        ImGui::PopID();
+
+        ImGui::TableSetColumnIndex(1);
+        ImGui::Text("%s", var_->type->name.c_str());
+    }
+    else if (std::holds_alternative<typename st::reference>(var_->type->u))
+    {
+        ImGui::TableSetColumnIndex(0);
+        ImGui::PushID(id_);
+        if (ImGui::Selectable(var_->name.c_str(), false, ImGuiSelectableFlags_SpanAllColumns));
+        ImGui::PopID();
+
+        ImGui::TableSetColumnIndex(1);
+        ImGui::Text("%s", var_->type->name.c_str());
+    }
+    else if (std::holds_alternative<typename st::type_def>(var_->type->u))
+    {
+        ImGui::TableSetColumnIndex(0);
+        ImGui::PushID(id_);
+        if (ImGui::Selectable(var_->name.c_str(), false, ImGuiSelectableFlags_SpanAllColumns));
+        ImGui::PopID();
+
+        ImGui::TableSetColumnIndex(1);
+        
+        // TODO: Can this be something else than fundamental?
+        typename st::fundamental& base = std::get<typename st::fundamental>(var_->type->u);
+        
+        std::string name = imagehlp_get_fundamental_name(base.type, var_->type->size);
+        ImGui::Text("%s (%s)", var_->type->name.c_str(), name.c_str());
+    }
+    else if (std::holds_alternative<typename st::user_defined>(var_->type->u))
+    {
+        ImGui::TableSetColumnIndex(1);
+
+        // TODO: Can this be something else than fundamental?
+        typename st::user_defined& base = std::get<typename st::user_defined>(var_->type->u);
+        std::string name = "<unknown>";
+        if (base.kind == imagehlp_symbol_type_udt_kind::CLASS) name = "class";
+        else if (base.kind == imagehlp_symbol_type_udt_kind::STRUCT) name = "struct";
+        else if (base.kind == imagehlp_symbol_type_udt_kind::UNION) name = "union";
+        else if (base.kind == imagehlp_symbol_type_udt_kind::INTERFACE) name = "interface";
+        
+        ImGui::Text("%s (%s)", var_->type->name.c_str(), name.c_str());
+
+        ImGui::TableSetColumnIndex(0);
+        bool open = ImGui::TreeNodeEx(var_->name.c_str(), ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_SpanFullWidth);
+
+        if (open)
+        {
+            size_t i = id_;
+            for (auto& e : base.variables)
+            {
+                ++i;
+                draw_variable(e, i);
+            }
+            ImGui::TreePop();
+        }
+    }
+
+    
 }
