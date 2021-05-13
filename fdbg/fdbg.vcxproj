@@ -164,13 +164,13 @@
     <ClInclude Include="controller\c_output.hpp" />
     <ClInclude Include="controller\c_process_selector.hpp" />
     <ClInclude Include="controller\c_registers.hpp" />
+    <ClInclude Include="controller\c_source_view.hpp" />
     <ClInclude Include="controller\c_stack.hpp" />
     <ClInclude Include="controller\c_threads.hpp" />
     <ClInclude Include="controller\c_tool_bar.hpp" />
     <ClInclude Include="dbg\debug_events.hpp" />
     <ClInclude Include="dbg\debug_task_queue.hpp" />
     <ClInclude Include="dbg\dlls.hpp" />
-    <ClInclude Include="dbg\source_view.hpp" />
     <ClInclude Include="dbg\process.hpp" />
     <ClInclude Include="model\model_interface.hpp" />
     <ClInclude Include="model\m_break_points.hpp" />
@@ -179,6 +179,7 @@
     <ClInclude Include="model\m_process_launcher.hpp" />
     <ClInclude Include="model\m_process_selector.hpp" />
     <ClInclude Include="model\m_registers.hpp" />
+    <ClInclude Include="model\m_source_view.hpp" />
     <ClInclude Include="model\m_stack.hpp" />
     <ClInclude Include="model\m_threads.hpp" />
     <ClInclude Include="model\m_tool_bar.hpp" />
@@ -209,6 +210,7 @@
     <ClCompile Include="controller\c_output.cpp" />
     <ClCompile Include="controller\c_process_selector.cpp" />
     <ClCompile Include="controller\c_registers.cpp" />
+    <ClCompile Include="controller\c_source_view.cpp" />
     <ClCompile Include="controller\c_stack.cpp" />
     <ClCompile Include="controller\c_threads.cpp" />
     <ClCompile Include="controller\c_tool_bar.cpp" />
@@ -217,7 +219,6 @@
     <ClCompile Include="dbg\debug_task_queue.cpp" />
     <ClCompile Include="dbg\dlls.cpp" />
     <ClCompile Include="dbg\process.cpp" />
-    <ClCompile Include="dbg\source_view.cpp" />
     <ClCompile Include="model\model_interface.cpp" />
     <ClCompile Include="view\view_interface.cpp" />
     <ClCompile Include="view\v_menu_bar.cpp" />
@@ -236,6 +237,7 @@
     <ClCompile Include="view\v_process_launcher.cpp" />
     <ClCompile Include="view\v_process_selector.cpp" />
     <ClCompile Include="view\v_registers.cpp" />
+    <ClCompile Include="view\v_source_view.cpp" />
     <ClCompile Include="view\v_stack.cpp" />
     <ClCompile Include="view\v_threads.cpp" />
     <ClCompile Include="view\v_tool_bar.cpp" />

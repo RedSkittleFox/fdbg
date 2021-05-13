@@ -75,9 +75,6 @@
     <ClInclude Include="dbg\debug_events.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dbg\source_view.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="win32_helpers\filesystem.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -144,6 +141,12 @@
     <ClInclude Include="model\m_process_launcher.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="model\m_source_view.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="controller\c_source_view.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -201,9 +204,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dbg\debug_events.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dbg\source_view.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="win32_helpers\filesystem.cpp">
@@ -270,6 +270,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="view\v_process_launcher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="view\v_source_view.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="controller\c_source_view.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

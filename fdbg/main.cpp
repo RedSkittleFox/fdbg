@@ -5,9 +5,6 @@
 #include <fdbg/dbg/process.hpp>
 #include <fdbg/dbg/debug_task_queue.hpp>
 
-#include <fdbg/view/view_interface.hpp>
-#include <fdbg/controller/controller_interface.hpp>
-
 #include <thread>
 #include <atomic>
 
@@ -31,9 +28,6 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
         // Main debugger loop
         dbg_update();
-
-        controller_manager::instance().update();
-        view_manager::instance().draw();
 
         render(wnd);
     }

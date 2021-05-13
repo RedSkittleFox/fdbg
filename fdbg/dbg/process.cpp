@@ -20,9 +20,9 @@ void process::start(const std::string& path_, std::string cmd_, const std::strin
 		STARTUPINFO si{ 0 };
 		PROCESS_INFORMATION pi{ 0 };
 		si.cb = sizeof(si);
-		CreateProcess(path_.c_str(), cmd == "" ? nullptr : cmd.data(), nullptr, nullptr, false,
+		CreateProcess(path_.c_str(), cmd == std::string() ? nullptr : cmd.data(), nullptr, nullptr, false,
 			DEBUG_ONLY_THIS_PROCESS, // TODO: Should this be DEBUG_ONLY_THIS_PROCESS?
-			nullptr, env_ == "" ? nullptr : env_.c_str(), &si, &pi);
+			nullptr, env_ == std::string() ? nullptr : env_.c_str(), &si, &pi);
 
 		this->m_process = pi.dwProcessId;
 		this->m_handle = pi.hProcess;

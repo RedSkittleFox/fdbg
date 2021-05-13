@@ -2,6 +2,7 @@
 #include <fdbg/view/view_interface.hpp>
 #include <fdbg/model/m_stack.hpp>
 #include <fdbg/controller/c_stack.hpp>
+#include <fdbg/controller/c_source_view.hpp>
 
 struct stack_trace_view : public view<stack_trace_view, stack_trace_model>
 {
@@ -58,7 +59,12 @@ void stack_trace_view::draw()
                     ImGui::PushID(row_n);
                     if (ImGui::Selectable(entry.name.c_str(), mvc<stack_model>().current_stack_entry == row_n, ImGuiSelectableFlags_SpanAllColumns))
                     {
-                        mvc<stack_model>().current_stack_entry = row_n;
+                        auto& smdl = mvc<stack_model>();
+                        smdl.current_stack_entry = row_n;
+                        mvc<source_view_controller>().set_file(
+                            smdl.call_stack[row_n].source_file,
+                            smdl.call_stack[row_n].line_number,
+                            true);
                     }
 
                     ImGui::PopID();

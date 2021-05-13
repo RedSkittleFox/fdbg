@@ -10,8 +10,10 @@
 #include <fdbg/controller/c_threads.hpp>
 #include <fdbg/dbg/dlls.hpp>
 #include <fdbg/dbg/debug_events.hpp>
-#include <fdbg/dbg/source_view.hpp>
 #include <fdbg/controller/c_break_points.hpp>
+
+#include <fdbg/view/view_interface.hpp>
+#include <fdbg/controller/controller_interface.hpp>
 
 // Hack: exclusion of code
 
@@ -114,7 +116,8 @@ void dbg_update()
     // Declare Central dockspace
     ImGui::DockSpaceOverViewport();
 
-    source_view::instance().update();
+    controller_manager::instance().update();
+    view_manager::instance().draw();
 
     static bool demo = true;
     ImGui::ShowDemoWindow(&demo);
