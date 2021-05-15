@@ -24,6 +24,12 @@ public:
 	// Revert breakpoint to 
 	void revert_break_point(void* address_);
 
+	// Create a breakpoint
+	void create_break_point(const std::string& filename_, size_t line_);
+
+	// Revert breakpoint 
+	void revert_break_point(const std::string& filename_, size_t line_);
+
 	// Set trap flag on every thread
 	void create_trap_break_point();
 

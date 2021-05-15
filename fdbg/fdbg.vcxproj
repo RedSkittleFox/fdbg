@@ -221,6 +221,7 @@
     <ClCompile Include="dbg\process.cpp" />
     <ClCompile Include="model\model_interface.cpp" />
     <ClCompile Include="view\view_interface.cpp" />
+    <ClCompile Include="view\v_break_points.cpp" />
     <ClCompile Include="view\v_menu_bar.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />

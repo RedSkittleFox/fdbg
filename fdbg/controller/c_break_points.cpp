@@ -39,25 +39,51 @@ void break_points_controller::continue_debug()
 void break_points_controller::create_break_point(void* address_)
 {
 	SIZE_T read_bytes;
-	break_points_model::break_point bp;
-	bp.address = address_;
+	
 	std::uint8_t ist; // Original instruction data
 
 	// Get the data we are replacing
 	ReadProcessMemory(process::instance().handle(),
 		address_, &ist, 1, &read_bytes);
-	bp.replaced_instruction = ist;
 
 	// Write the INT to the pointer
 	std::uint8_t INT = 0xCC; // Interrupt instruction
 	WriteProcessMemory(process::instance().handle(), address_, &INT, 1, &read_bytes);
 	FlushInstructionCache(process::instance().handle(), address_, 1);
 
+	break_points_model::break_point bp
+	{
+		.source = "",
+		.line = 0u,
+		.address = address_,
+		.replaced_instruction = ist,
+		.single_hit = true,
+		.try_revert = false
+	};
+
 	model().break_points.push_back(bp);
 }
 
 void break_points_controller::revert_break_point(void* address_)
 {
+	// Restore try revert breakpoints
+	{
+		auto& bp = model().break_points;
+		for (auto& b : bp)
+		{
+			if (b.try_revert == true)
+			{
+				SIZE_T read_bytes;
+				std::uint8_t INT = 0xCC; // Interrupt instruction
+				WriteProcessMemory(process::instance().handle(), b.address, &INT,
+					1, &read_bytes);
+
+				FlushInstructionCache(process::instance().handle(), b.address, 1);
+				b.try_revert = false;
+			}
+		}
+	}
+
 	// Check if the breakpoint we've hit was put in place by us
 	auto res = std::find_if(std::begin(model().break_points), std::end(model().break_points),
 		[address_](const auto& e__)
@@ -80,17 +106,73 @@ void break_points_controller::revert_break_point(void* address_)
 		v = SetThreadContext(dbg_thread(), &context);
 	}
 
-	// Remove step break points
+	// Remove Breakpoint
 	{
 		SIZE_T read_bytes;
 		WriteProcessMemory(process::instance().handle(), address_, &res->replaced_instruction,
 			1, &read_bytes);
 
-
 		FlushInstructionCache(process::instance().handle(), address_, 1);
 	}
+	
+	// Handle breakpoint meta
+	{
+		// if we are once-hit breakpoint, remove itself
+		if(res->single_hit)
+		{
+			model().break_points.erase(res);
+		}
+		else
+		{
+			res->try_revert = true;
+		}
+	}
+}
 
-	model().break_points.erase(res);
+void break_points_controller::create_break_point(const std::string& filename_, size_t line_)
+{
+	DWORD disp;
+
+	auto ptr = imagehlp_get_line_address(filename_, line_);
+
+	if (ptr == nullptr) return;
+
+	SIZE_T read_bytes;
+
+	std::uint8_t ist; // Original instruction data
+
+	// Get the data we are replacing
+	ReadProcessMemory(process::instance().handle(),
+		ptr, &ist, 1, &read_bytes);
+
+	// Write the INT to the pointer
+	std::uint8_t INT = 0xCC; // Interrupt instruction
+	WriteProcessMemory(process::instance().handle(), ptr, &INT, 1, &read_bytes);
+	FlushInstructionCache(process::instance().handle(), ptr, 1);
+
+	break_points_model::break_point bp
+	{
+		.source = filename_,
+		.line = line_,
+		.address = ptr,
+		.replaced_instruction = ist,
+		.single_hit = false,
+		.try_revert = false
+	};
+
+	model().break_points.push_back(bp);
+}
+
+void break_points_controller::revert_break_point(const std::string& filename_, size_t line_)
+{
+	for (auto& bp : model().break_points)
+	{
+		if (line_ == bp.line && bp.source == filename_)
+		{
+			revert_break_point(bp.address);
+			return;
+		}
+	}
 }
 
 void break_points_controller::create_trap_break_point()

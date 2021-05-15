@@ -2,6 +2,9 @@
 #include <fdbg/view/view_interface.hpp>
 #include <fdbg/model/m_source_view.hpp>
 #include <fdbg/controller/c_source_view.hpp>
+#include <fdbg/model/m_break_points.hpp>
+#include <fdbg/controller/c_break_points.hpp>
+#include <fdbg/dbg/debug_task_queue.hpp>
 
 struct source_view_view : public view<source_view_view, source_view_model>
 {
@@ -42,6 +45,44 @@ void source_view_view::draw()
 					ImGui::TableNextRow(ImGuiTableRowFlags_None, 0);
 
 					ImGui::TableSetColumnIndex(0);
+					// This is SUPER SLOW
+					// TODO: Implement faster solution
+					{
+						bool selected = false;
+						typename break_points_model::break_point* pbp = nullptr;
+
+						auto& bpm = mvc<break_points_model>();
+						for (auto& bp : bpm.break_points)
+						{
+							if (bp.line == row_n 
+								&& bp.source == model().current_file.file_name)
+							{
+								selected = true;
+								pbp = &bp;
+								goto loop_end;
+							}
+						}
+					loop_end:
+
+						ImGui::PushID(row_n << 2);
+						ImGui::Checkbox("", &selected);
+						ImGui::PopID();
+
+						bool in_break = mvc<break_points_model>().in_break;
+						debug_task_queue::instance().push(
+							[=]
+							{
+								if (in_break)
+								{
+									if (selected == true && pbp == nullptr)
+										mvc<break_points_controller>().create_break_point(model().current_file.file_name, row_n);
+									else if (selected == false && pbp != nullptr)
+										mvc<break_points_controller>().revert_break_point(model().current_file.file_name, row_n);
+								}
+							}
+							);
+						
+					}
 
 					ImGui::TableSetColumnIndex(1);
 					ImGui::PushID(row_n);

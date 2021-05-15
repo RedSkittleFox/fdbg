@@ -8,18 +8,12 @@ struct break_points_model : public view_model<break_points_model>
 {
 	struct break_point
 	{
-		bool enabled;			// Breakpoint is enabled
-		std::string source;		// Source file
-		size_t line;			// Source line
-
-		// TODO:
-		// bool single_hit;
-
-		std::string dll;		// Dll file
-		void* address;			// Address (global)
-
-		// Replaced instruction data
-		std::uint8_t replaced_instruction;
+		std::string source;					// Source file
+		size_t line;						// Source line
+		void* address;						// Address (global)
+		std::uint8_t replaced_instruction;  // Replaced instruction data
+		bool single_hit;
+		bool try_revert;
 	};
 
 	bool in_break;

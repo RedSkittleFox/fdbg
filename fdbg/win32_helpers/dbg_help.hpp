@@ -181,6 +181,7 @@ struct imagehlp_symbol_type
 std::vector<DWORD> imagehlp_get_children(DWORD id_, DWORD64 base_);
 std::string imagehlp_get_name(DWORD id_, DWORD64 base_);
 std::string imagehlp_get_fundamental_name(imagehlp_symbol_type_fundamental_type type_, size_t size_);
+void* imagehlp_get_line_address(const std::string& name_, size_t line_);
 
 class imagehlp_symbol_manager
 {

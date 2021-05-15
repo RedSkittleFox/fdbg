@@ -278,5 +278,8 @@
     <ClCompile Include="controller\c_source_view.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="view\v_break_points.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

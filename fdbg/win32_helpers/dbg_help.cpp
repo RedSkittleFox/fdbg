@@ -137,6 +137,81 @@ std::vector<DWORD> imagehlp_get_children(DWORD id_, DWORD64 base_)
 	return ret;
 }
 
+void* imagehlp_get_line_address(const std::string& name_, size_t line_)
+{
+	// I want to know the reason why this doesn't work,
+	// email me at RedSkittleFox@gmail.com if you know this :P
+	// 	   
+	// if (line_ == 0) return nullptr;
+	// 
+	// std::vector<DWORD64> buf(line_, 0x0u);
+	// 
+	// ULONG rv = ::SymGetFileLineOffsets64(
+	// 	dbg_process(),
+	// 	nullptr,
+	// 	name_.c_str(),
+	// 	buf.data(),
+	// 	buf.size()
+	// );
+	// 
+	// if (rv == 0) return nullptr;
+	// if (rv < line_) return nullptr;
+	// 
+	// return std::bit_cast<void*>(buf[rv - 1]);
+
+	// Worse but working solution
+
+	// Enumerate modules
+	// TODO: Use internal register
+	std::vector<DWORD64> modules;
+	auto sym_enum_modules_callback = [](const char* name_, DWORD64 base_, void* vec_) -> BOOL CALLBACK
+	{
+		using vec_t = decltype(modules);
+		vec_t* p_mod = std::bit_cast<vec_t*>(vec_);
+
+		p_mod->push_back(base_);
+		return true;
+	};
+
+	if (SymEnumerateModules64(dbg_process(), sym_enum_modules_callback, &modules) == FALSE) return nullptr;
+
+	// Enumerate source lines
+	struct
+	{
+		void* address;
+		size_t line_number;
+	} sym_enum_lines_callback_context
+	{
+		.address = nullptr,
+		.line_number = line_
+	};
+
+	auto sym_enum_lines_callback = [](PSRCCODEINFO info_, void* user_context_) -> BOOL CALLBACK
+	{
+		using callback_t = decltype(sym_enum_lines_callback_context);
+		callback_t* addr = std::bit_cast<callback_t*>(user_context_);
+
+		// We want to find the next closest line to the statement
+		if (info_->LineNumber >= addr->line_number)
+		{
+			addr->address = std::bit_cast<void*>(info_->Address);
+			return false;
+		}
+
+		return true;
+	};
+
+	for (auto mod : modules)
+	{
+		if (SymEnumLines(dbg_process(), mod, nullptr, name_.c_str(),
+			sym_enum_lines_callback, &sym_enum_lines_callback_context) == FALSE) continue;
+
+		if (sym_enum_lines_callback_context.address != nullptr) break;
+	}
+
+	return sym_enum_lines_callback_context.address;
+}
+
 std::string imagehlp_get_name(DWORD id_, DWORD64 base_)
 {
 	std::string ret;
@@ -549,7 +624,7 @@ imagehlp_symbol_function* imagehlp_symbol_manager::register_function(DWORD id_, 
 
 HANDLE dbg_process()
 {
-	return HANDLE();
+	return process::instance().handle();
 }
 
 HANDLE dbg_thread()
