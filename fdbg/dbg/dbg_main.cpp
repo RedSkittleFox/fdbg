@@ -30,6 +30,8 @@ void dbg_communication_loop_stop()
 // TODO: Refactor me
 void dbg_communication_loop()
 {
+    SetThreadDescription(GetCurrentThread(), L"Homo Thread");
+
     static DEBUG_EVENT dbe;
     DWORD continue_status = DBG_CONTINUE;
     static bool hit_once = false;

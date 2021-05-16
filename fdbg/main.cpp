@@ -20,6 +20,7 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     create_imgui(wnd);
 
     std::jthread db_thread(dbg_communication_loop);
+    
 
     while (update_window(wnd))
     {

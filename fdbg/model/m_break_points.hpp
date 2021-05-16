@@ -18,6 +18,11 @@ struct break_points_model : public view_model<break_points_model>
 
 	bool in_break;
 	std::vector<break_point> break_points;
+
+	struct
+	{
+		bool treat_as_breakpoint;
+	} trap_breakpoint;
 };
 
 #endif

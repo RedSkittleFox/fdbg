@@ -66,23 +66,7 @@ void break_points_controller::create_break_point(void* address_)
 
 void break_points_controller::revert_break_point(void* address_)
 {
-	// Restore try revert breakpoints
-	{
-		auto& bp = model().break_points;
-		for (auto& b : bp)
-		{
-			if (b.try_revert == true)
-			{
-				SIZE_T read_bytes;
-				std::uint8_t INT = 0xCC; // Interrupt instruction
-				WriteProcessMemory(process::instance().handle(), b.address, &INT,
-					1, &read_bytes);
-
-				FlushInstructionCache(process::instance().handle(), b.address, 1);
-				b.try_revert = false;
-			}
-		}
-	}
+	// this->try_revert_break_points();
 
 	// Check if the breakpoint we've hit was put in place by us
 	auto res = std::find_if(std::begin(model().break_points), std::end(model().break_points),
@@ -124,15 +108,15 @@ void break_points_controller::revert_break_point(void* address_)
 		}
 		else
 		{
+			// We are creating this in order to trigger revert of the break point
 			res->try_revert = true;
+			this->create_trap_break_point(false);
 		}
 	}
 }
 
 void break_points_controller::create_break_point(const std::string& filename_, size_t line_)
 {
-	DWORD disp;
-
 	auto ptr = imagehlp_get_line_address(filename_, line_);
 
 	if (ptr == nullptr) return;
@@ -165,22 +149,27 @@ void break_points_controller::create_break_point(const std::string& filename_, s
 
 void break_points_controller::revert_break_point(const std::string& filename_, size_t line_)
 {
+	return;
 	for (auto& bp : model().break_points)
 	{
 		if (line_ == bp.line && bp.source == filename_)
 		{
 			revert_break_point(bp.address);
+
 			return;
 		}
 	}
 }
 
-void break_points_controller::create_trap_break_point()
+void break_points_controller::create_trap_break_point(bool treat_as_breakpoint_)
 {
+	// In case we are using it in assembly step over mode
+	model().trap_breakpoint.treat_as_breakpoint = treat_as_breakpoint_;
+
 	for (auto& t : mvc<threads_controller>().get_threads())
 	{
 		// If debugging of the thread is disabled, skip it
-		if (t.debug_enabled == false) continue;
+		if (t.debug_enabled == false && treat_as_breakpoint_) continue;
 
 		HANDLE hd = t.handle;
 
@@ -200,8 +189,29 @@ void break_points_controller::create_trap_break_point()
 	}
 }
 
+void break_points_controller::try_revert_break_points()
+{
+	// Restore try revert breakpoints
+	auto& bp = model().break_points;
+	for (auto& b : bp)
+	{
+		if (b.try_revert == true)
+		{
+			SIZE_T read_bytes;
+			std::uint8_t INT = 0xCC; // Interrupt instruction
+			WriteProcessMemory(process::instance().handle(), b.address, &INT,
+				1, &read_bytes);
+
+			FlushInstructionCache(process::instance().handle(), b.address, 1);
+			b.try_revert = false;
+		}
+	}
+}
+
 void break_points_controller::rever_trap_break_points()
 {
+	this->try_revert_break_points();
+
 	for (auto& t : mvc<threads_controller>().get_threads())
 	{
 		debug_task_queue::instance().push([=]

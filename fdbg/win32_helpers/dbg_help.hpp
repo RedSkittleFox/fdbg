@@ -186,7 +186,7 @@ void* imagehlp_get_line_address(const std::string& name_, size_t line_);
 class imagehlp_symbol_manager
 {
 private:
-    std::unordered_map<DWORD, imagehlp_symbol_type> m_types;
+    std::unordered_map<std::string, imagehlp_symbol_type> m_types;
     std::unordered_map<DWORD, imagehlp_symbol_variable> m_variables;
     std::unordered_map<DWORD, imagehlp_symbol_function> m_functions;
 

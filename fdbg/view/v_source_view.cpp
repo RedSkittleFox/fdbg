@@ -38,7 +38,7 @@ void source_view_view::draw()
 			clipper.Begin(current.file->size());
 			while (clipper.Step())
 			{
-				for (int row_n = clipper.DisplayStart; row_n < clipper.DisplayEnd; ++row_n)
+				for (size_t row_n = clipper.DisplayStart; row_n < clipper.DisplayEnd; ++row_n)
 				{
 					auto& line = current.file->operator[](row_n);
 
@@ -54,7 +54,7 @@ void source_view_view::draw()
 						auto& bpm = mvc<break_points_model>();
 						for (auto& bp : bpm.break_points)
 						{
-							if (bp.line == row_n 
+							if (bp.line - 1 == row_n
 								&& bp.source == model().current_file.file_name)
 							{
 								selected = true;
@@ -75,9 +75,9 @@ void source_view_view::draw()
 								if (in_break)
 								{
 									if (selected == true && pbp == nullptr)
-										mvc<break_points_controller>().create_break_point(model().current_file.file_name, row_n);
+										mvc<break_points_controller>().create_break_point(model().current_file.file_name, row_n + 1);
 									else if (selected == false && pbp != nullptr)
-										mvc<break_points_controller>().revert_break_point(model().current_file.file_name, row_n);
+										mvc<break_points_controller>().revert_break_point(model().current_file.file_name, row_n + 1);
 								}
 							}
 							);

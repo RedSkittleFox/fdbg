@@ -192,7 +192,7 @@ void* imagehlp_get_line_address(const std::string& name_, size_t line_)
 		callback_t* addr = std::bit_cast<callback_t*>(user_context_);
 
 		// We want to find the next closest line to the statement
-		if (info_->LineNumber >= addr->line_number)
+		if (info_->LineNumber == addr->line_number)
 		{
 			addr->address = std::bit_cast<void*>(info_->Address);
 			return false;
@@ -313,7 +313,10 @@ imagehlp_symbol_manager& imagehlp_symbol_manager::instance()
 
 imagehlp_symbol_type* imagehlp_symbol_manager::type(DWORD id_, DWORD64 base_)
 {
-	auto res = m_types.find(id_);
+	// Get Symbol name
+	auto name = imagehlp_get_name(id_, base_);
+
+	auto res = m_types.find(name);
 	if (res == std::end(m_types))
 		return register_type(id_, base_);
 
@@ -329,6 +332,7 @@ imagehlp_symbol_variable* imagehlp_symbol_manager::varaible(DWORD id_, DWORD64 b
 	return &res->second;
 }
 
+// This causes stack overflow, idk why, we don't need it anyway
 imagehlp_symbol_function* imagehlp_symbol_manager::function(DWORD id_, DWORD64 base_)
 {
 	auto res = m_functions.find(id_);
@@ -342,47 +346,59 @@ imagehlp_symbol_type* imagehlp_symbol_manager::register_type(DWORD id_, DWORD64 
 {
 	if (id_ == 0) return nullptr;
 
-	imagehlp_symbol_type type;
-	type.id = id_;
-
 	// Get the type of the *type*
 	DWORD tag = {};
 	BOOL res = SymGetTypeInfo(process::instance().handle(), base_, id_, TI_GET_SYMTAG, &tag);
+
+	imagehlp_symbol_type* type{ nullptr };
 
 	bool has_size = false;
 	switch (tag)
 	{
 	case (SymTagBaseType):
 	{
-		imagehlp_symbol_type::fundamental u;
-
-		// Get pointer's size
-		ULONG64 size = {};
-		BOOL res = SymGetTypeInfo(process::instance().handle(), base_, id_, TI_GET_LENGTH, &size);
-		type.size = size;
-
+		// Get fundamental type index
 		DWORD fundamental_idx = {};
 		res = SymGetTypeInfo(process::instance().handle(), base_, id_, TI_GET_BASETYPE, &fundamental_idx);
 
-		// type.name = imagehlp_get_name(id_, base_);
-		type.name = imagehlp_get_fundamental_name(static_cast<imagehlp_symbol_type_fundamental_type>(fundamental_idx), size);
+		// Get size
+		ULONG64 size = {};
+		BOOL res = SymGetTypeInfo(process::instance().handle(), base_, id_, TI_GET_LENGTH, &size);
+
+		std::string name = imagehlp_get_fundamental_name(static_cast<imagehlp_symbol_type_fundamental_type>(fundamental_idx), size);
 		
+		if (auto res = m_types.find(name); res != std::end(m_types)) 
+			return &res->second;
+		
+		type = &m_types[name];
+		type->name = name;
+		type->id = id_;
+		type->size = size;
+
 		// Get fundamental type type
+		imagehlp_symbol_type::fundamental u;
 		u.type = static_cast<imagehlp_symbol_type_fundamental_type>(fundamental_idx);
-		type.u = u;
+		type->u = u;
 		break;
 	}
 	case (SymTagEnum):
 	{
-		type.name = imagehlp_get_name(id_, base_);
+		std::string name = imagehlp_get_name(id_, base_);
+
+		if (auto res = m_types.find(name); res != std::end(m_types))
+			return &res->second;
+
+		type = &m_types[name];
+		type->name = name;
+		type->id = id_;
+
 		imagehlp_symbol_type::enumeration u;
 		has_size = true;
-		type.u = u;
+		type->u = u;
 		break;
 	}
 	case (SymTagArrayType):
 	{
-
 		imagehlp_symbol_type::array u;
 		has_size = true;
 
@@ -396,8 +412,15 @@ imagehlp_symbol_type* imagehlp_symbol_manager::register_type(DWORD id_, DWORD64 
 		res = SymGetTypeInfo(process::instance().handle(), base_, id_, TI_GET_TYPE, &type_id);
 		u.type = this->type(type_id, base_);
 
-		type.name = u.type->name + '[' + std::to_string(u.size) + ']';
-		type.u = u;
+		std::string name = u.type->name + '[' + std::to_string(u.size) + ']';
+		if (auto res = m_types.find(name); res != std::end(m_types))
+			return &res->second;
+
+		type = &m_types[name];
+		type->name = name;
+		type->id = id_;
+
+		type->u = u;
 		break;
 	}
 	case(SymTagPointerType):
@@ -415,8 +438,16 @@ imagehlp_symbol_type* imagehlp_symbol_manager::register_type(DWORD id_, DWORD64 
 			DWORD type_id = {};
 			BOOL res = SymGetTypeInfo(process::instance().handle(), base_, id_, TI_GET_TYPE, &type_id);
 			u.type = this->type(type_id, base_);
-			type.u = u;
-			type.name = u.type->name + '*';
+			std::string name = u.type->name + '*';
+			
+			if (auto res = m_types.find(name); res != std::end(m_types))
+				return &res->second;
+
+			type = &m_types[name];
+			type->name = name;
+			type->id = id_;
+
+			type->u = u;
 		}
 		else
 		{
@@ -427,13 +458,29 @@ imagehlp_symbol_type* imagehlp_symbol_manager::register_type(DWORD id_, DWORD64 
 			DWORD type_id = {};
 			BOOL res = SymGetTypeInfo(process::instance().handle(), base_, id_, TI_GET_TYPE, &type_id);
 			u.type = this->type(type_id, base_);
-			type.u = u;
-			type.name = u.type->name + '&';
+			std::string name = u.type->name + '&';
+
+			if (auto res = m_types.find(name); res != std::end(m_types))
+				return &res->second;
+
+			type = &m_types[name];
+			type->name = name;
+			type->id = id_;
+
+			type->u = u;
 		}
 		break;
 	}
 	case(SymTagTypedef):
 	{
+		std::string name = imagehlp_get_name(id_, base_);
+		if (auto res = m_types.find(name); res != std::end(m_types))
+			return &res->second;
+
+		type = &m_types[name];
+		type->name = name;
+		type->id = id_;
+
 		has_size = false;
 		imagehlp_symbol_type::type_def u;
 
@@ -441,9 +488,8 @@ imagehlp_symbol_type* imagehlp_symbol_manager::register_type(DWORD id_, DWORD64 
 		BOOL res = SymGetTypeInfo(process::instance().handle(), base_, id_, TI_GET_TYPE, &type_id);
 		u.type = this->type(type_id, base_);
 
-		type.size = u.type->size;
-		type.u = u;
-		type.name = imagehlp_get_name(id_, base_);
+		type->size = u.type->size;
+		type->u = u;
 		break;
 	}
 	case(SymTagFunctionType):
@@ -476,24 +522,30 @@ imagehlp_symbol_type* imagehlp_symbol_manager::register_type(DWORD id_, DWORD64 
 			u.parent = this->type(parent, base_);
 		}
 
-		type.u = u;
-
-		type.name = u.return_type->name;
+		std::string name = u.return_type->name;
 		
 		// (Parent::)
 		if (u.parent != nullptr)
 		{
-			type.name += '(' + u.parent->name + "::)";
+			name += '(' + u.parent->name + "::)";
 		}
 
-		type.name += '(';
+		name += '(';
 		for (size_t i = {}; i < u.parameters.size(); ++i)
 		{
 			auto& parmams = u.parameters[i];
 			if (i + 1 != u.parameters.size())
-				type.name += parmams->name + ", ";
+				name += parmams->name + ", ";
 		};
-		type.name += ')';
+		name += ')';
+
+		if (auto res = m_types.find(name); res != std::end(m_types))
+			return &res->second;
+
+		type = &m_types[name];
+		type->name = name;
+		type->id = id_;
+		type->u = u;
 
 		break;
 	}
@@ -501,6 +553,14 @@ imagehlp_symbol_type* imagehlp_symbol_manager::register_type(DWORD id_, DWORD64 
 	{
 		has_size = true;
 		imagehlp_symbol_type::user_defined u;
+
+		std::string name = imagehlp_get_name(id_, base_);
+		if (auto res = m_types.find(name); res != std::end(m_types))
+			return &res->second;
+
+		type = &m_types[name];
+		type->name = name;
+		type->id = id_;
 
 		// Get kind
 		{
@@ -513,7 +573,6 @@ imagehlp_symbol_type* imagehlp_symbol_manager::register_type(DWORD id_, DWORD64 
 		// Get Children, those can be "variables", "functions", "base classes"
 		auto children = imagehlp_get_children(id_, base_);
 
-		// Get functions
 		for (auto id : children)
 		{
 			imagehlp_symbol_function* function = this->function(id, base_);
@@ -537,24 +596,23 @@ imagehlp_symbol_type* imagehlp_symbol_manager::register_type(DWORD id_, DWORD64 
 				u.base_classes.push_back(base_type);
 		}
 
-		type.u = u;
-		type.name = imagehlp_get_name(id_, base_);
-
+		type->u = u;
+		
 		break;
 	}
 	default:
 		return nullptr;
 	};
 
-	if (has_size)
+	if (has_size && type != nullptr)
 	{
 		// Get pointer's size
 		ULONG64 size = {};
 		BOOL res = SymGetTypeInfo(process::instance().handle(), base_, id_, TI_GET_LENGTH, &size);
-		type.size = size;
+		type->size = size;
 	}
 	
-	return &m_types.insert(std::make_pair(id_, type)).first->second;
+	return type;
 }
 
 // TODO: TI_GET_ADDRESS

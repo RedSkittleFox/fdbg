@@ -31,7 +31,10 @@ public:
 	void revert_break_point(const std::string& filename_, size_t line_);
 
 	// Set trap flag on every thread
-	void create_trap_break_point();
+	void create_trap_break_point(bool treat_as_breakpoint_ = true);
+
+	// Try revert breakpoints
+	void try_revert_break_points();
 
 	// Remove trap flag from every thread
 	void rever_trap_break_points();

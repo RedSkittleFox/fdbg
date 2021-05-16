@@ -54,9 +54,15 @@ bool exception_debug_event(const DEBUG_EVENT& dbe_)
             return true;
         }
 
+        // We don't want to break the debugger if the trap isn't used as a break point
+        if (!mvc<break_points_model>().trap_breakpoint.treat_as_breakpoint) return true;
+
         break;
     }
+    default:
+        mvc<output_controller>().printl("General", "Unknown Exception Type");
     }
+    mvc<output_controller>().printl("General", std::to_string((size_t)dbe_.u.Exception.ExceptionRecord.ExceptionAddress));
 
     mvc<break_points_controller>().trigger();
 	return false;
@@ -126,7 +132,7 @@ bool exit_process_debug_event(const DEBUG_EVENT& dbe_)
     process::instance().detach();        
     mvc<output_controller>().printl("Debug", std::string("Process has exited with code '") + std::to_string(dbe_.u.ExitProcess.dwExitCode) + std::string("."));
 
-    // Unregister thread
+    // TODO: Unregister thread
 
     // TODO: Clear breakpoints, threads etc.
 
